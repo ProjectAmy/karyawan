@@ -1,5 +1,6 @@
 "use client";
 import React, { useState } from "react";
+import Image from "next/image";
 
 import Header from "../components/Header";
 import Sidebar from "../components/Sidebar";
@@ -68,22 +69,22 @@ export default function KaryawanBaruPage() {
         <div>
           <label className="block text-sm font-medium mb-1 text-gray-800">Upload Foto KTP</label>
           <input type="file" name="fotoKTP" accept="image/*" onChange={handleFile} className="w-full text-gray-800" style={{color:'#1e293b'}} />
-          {preview.fotoKTP && <img src={preview.fotoKTP} alt="Preview KTP" className="mt-2 h-20 rounded" />}
+          {preview.fotoKTP && <Image src={preview.fotoKTP} alt="Preview KTP" width={120} height={80} className="mt-2 h-20 rounded" />}
         </div>
         <div>
           <label className="block text-sm font-medium mb-1 text-gray-800">Upload Foto KK</label>
           <input type="file" name="fotoKK" accept="image/*" onChange={handleFile} className="w-full text-gray-800" style={{color:'#1e293b'}} />
-          {preview.fotoKK && <img src={preview.fotoKK} alt="Preview KK" className="mt-2 h-20 rounded" />}
+          {preview.fotoKK && <Image src={preview.fotoKK} alt="Preview KK" width={120} height={80} className="mt-2 h-20 rounded" />}
         </div>
         <div>
           <label className="block text-sm font-medium mb-1 text-gray-800">Upload Foto Buku Nikah</label>
           <input type="file" name="fotoBukuNikah" accept="image/*" onChange={handleFile} className="w-full text-gray-800" style={{color:'#1e293b'}} />
-          {preview.fotoBukuNikah && <img src={preview.fotoBukuNikah} alt="Preview Buku Nikah" className="mt-2 h-20 rounded" />}
+          {preview.fotoBukuNikah && <Image src={preview.fotoBukuNikah} alt="Preview Buku Nikah" width={120} height={80} className="mt-2 h-20 rounded" />}
         </div>
         <div>
           <label className="block text-sm font-medium mb-1 text-gray-800">Upload Foto Akte Anak</label>
           <input type="file" name="fotoAkteAnak" accept="image/*" onChange={handleFile} className="w-full text-gray-800" style={{color:'#1e293b'}} />
-          {preview.fotoAkteAnak && <img src={preview.fotoAkteAnak} alt="Preview Akte Anak" className="mt-2 h-20 rounded" />}
+          {preview.fotoAkteAnak && <Image src={preview.fotoAkteAnak} alt="Preview Akte Anak" width={120} height={80} className="mt-2 h-20 rounded" />}
         </div>
         <button type="submit" className="bg-blue-600 hover:bg-blue-700 text-white rounded px-4 py-2 font-bold mt-2">Simpan</button>
           </form>

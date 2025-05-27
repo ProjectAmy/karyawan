@@ -1,5 +1,6 @@
 "use client";
 import React from "react";
+import Image from "next/image";
 import Header from "../../components/Header";
 import Sidebar from "../../components/Sidebar";
 import Footer from "../../components/Footer";
@@ -50,19 +51,19 @@ export default function AhmadFauziDetail() {
               <h2 className="text-xl font-semibold mb-4 text-blue-700 text-center">Dokumen Foto</h2>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="flex flex-col items-center">
-                  <img src="https://dummyimage.com/200x120/cccccc/444444&text=KTP" alt="Foto KTP" className="rounded shadow mb-2 w-48 h-28 object-cover" />
+                  <Image src="https://dummyimage.com/200x120/cccccc/444444&text=KTP" alt="Foto KTP" width={200} height={120} className="rounded shadow mb-2 w-48 h-28 object-cover" />
                   <span className="text-gray-700 text-sm">Foto KTP</span>
                 </div>
                 <div className="flex flex-col items-center">
-                  <img src="https://dummyimage.com/200x120/cccccc/444444&text=KK" alt="Foto KK" className="rounded shadow mb-2 w-48 h-28 object-cover" />
+                  <Image src="https://dummyimage.com/200x120/cccccc/444444&text=KK" alt="Foto KK" width={200} height={120} className="rounded shadow mb-2 w-48 h-28 object-cover" />
                   <span className="text-gray-700 text-sm">Foto KK</span>
                 </div>
                 <div className="flex flex-col items-center">
-                  <img src="https://dummyimage.com/200x120/cccccc/444444&text=Buku+Nikah" alt="Foto Buku Nikah" className="rounded shadow mb-2 w-48 h-28 object-cover" />
+                  <Image src="https://dummyimage.com/200x120/cccccc/444444&text=Buku+Nikah" alt="Foto Buku Nikah" width={200} height={120} className="rounded shadow mb-2 w-48 h-28 object-cover" />
                   <span className="text-gray-700 text-sm">Foto Buku Nikah</span>
                 </div>
                 <div className="flex flex-col items-center">
-                  <img src="https://dummyimage.com/200x120/cccccc/444444&text=Akte+Anak" alt="Foto Akte Anak" className="rounded shadow mb-2 w-48 h-28 object-cover" />
+                  <Image src="https://dummyimage.com/200x120/cccccc/444444&text=Akte+Anak" alt="Foto Akte Anak" width={200} height={120} className="rounded shadow mb-2 w-48 h-28 object-cover" />
                   <span className="text-gray-700 text-sm">Foto Akte Anak</span>
                 </div>
               </div>
