@@ -8,14 +8,8 @@ export default function Home() {
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
-    // Dummy validation
-    if (!username || !password) {
-      setError("Username dan password harus diisi.");
-      return;
-    }
-    setError("");
-    // Lakukan proses login di sini
-    alert(`Login dengan username: ${username} dan password: ${password}`);
+    // Sementara langsung redirect ke dashboard
+    window.location.href = "/dashboard";
   };
 
   return (
