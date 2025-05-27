@@ -4,7 +4,7 @@ import { useState } from "react";
 export default function Home() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
+  // const [error, setError] = useState("");
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
@@ -35,7 +35,6 @@ export default function Home() {
           className="border border-gray-400 text-gray-800 placeholder-gray-400 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-base"
           autoComplete="current-password"
         />
-        {error && <div className="text-red-600 text-sm font-medium text-center">{error}</div>}
         <button
           type="submit"
           className="bg-blue-600 text-white rounded-md px-4 py-2 font-bold hover:bg-blue-700 transition text-base shadow-md"
