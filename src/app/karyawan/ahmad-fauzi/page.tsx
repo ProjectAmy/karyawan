@@ -47,6 +47,10 @@ export default function AhmadFauziDetail() {
               <dt className="font-semibold text-gray-700">Alamat:</dt>
               <dd className="text-gray-800">Jl. Merdeka No. 123, Jakarta</dd>
             </dl>
+            <div className="flex justify-center gap-4 mt-8">
+              <a href="/karyawan/ahmad-fauzi/edit" className="bg-green-600 hover:bg-green-700 px-4 py-2 rounded transition-colors text-white mr-2 inline-block text-center">Edit</a>
+              <button className="bg-red-500 hover:bg-red-700 px-4 py-2 rounded transition-colors text-white">Delete</button>
+            </div>
             <div className="mt-10">
               <h2 className="text-xl font-semibold mb-4 text-blue-700 text-center">Dokumen Foto</h2>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">

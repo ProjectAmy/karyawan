@@ -18,7 +18,7 @@ export default function Home() {
         onSubmit={handleLogin}
         className="bg-white p-8 rounded-lg shadow-lg flex flex-col gap-5 w-full max-w-sm border border-gray-200"
       >
-        <h1 className="text-3xl font-extrabold mb-6 text-center text-gray-800">Login</h1>
+        <h1 className="text-3xl font-extrabold mb-6 text-center text-gray-800">H.R.D</h1>
         <input
           type="text"
           placeholder="Username"

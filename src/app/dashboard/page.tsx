@@ -63,6 +63,7 @@ export default function DashboardPage() {
         <th className="border p-2">Awal Masuk</th>
         <th className="border p-2">Umur</th>
         <th className="border p-2">Masa Kerja</th>
+<th className="border p-2">Aksi</th>
       </tr>
     </thead>
     <tbody>
@@ -77,6 +78,10 @@ export default function DashboardPage() {
         <td className="border p-2">2018-07-01</td>
         <td className="border p-2">35</td>
         <td className="border p-2">6 thn</td>
+        <td className="border p-2 text-center">
+          <a href="/karyawan/ahmad-fauzi/edit" className="bg-green-600 hover:bg-green-700 px-4 py-2 rounded transition-colors text-white mr-2 inline-block text-center">Edit</a>
+          <button className="bg-red-500 hover:bg-red-700 px-4 py-2 rounded transition-colors text-white">Delete</button>
+        </td>
       </tr>
       <tr>
         <td className="border p-2 text-center">2</td>
@@ -89,6 +94,10 @@ export default function DashboardPage() {
         <td className="border p-2">2017-01-15</td>
         <td className="border p-2">40</td>
         <td className="border p-2">7 thn</td>
+<td className="border p-2 text-center">
+  <button className="bg-green-600 hover:bg-green-700 px-4 py-2 rounded transition-colors text-white mr-2">Edit</button>
+  <button className="bg-red-500 hover:bg-red-700 px-4 py-2 rounded transition-colors text-white">Delete</button>
+</td>
       </tr>
       <tr>
         <td className="border p-2 text-center">3</td>
@@ -101,6 +110,10 @@ export default function DashboardPage() {
         <td className="border p-2">2025-01-10</td>
         <td className="border p-2">24</td>
         <td className="border p-2">5 bln</td>
+<td className="border p-2 text-center">
+  <button className="bg-green-600 hover:bg-green-700 px-4 py-2 rounded transition-colors text-white mr-2">Edit</button>
+  <button className="bg-red-500 hover:bg-red-700 px-4 py-2 rounded transition-colors text-white">Delete</button>
+</td>
       </tr>
       <tr>
         <td className="border p-2 text-center">4</td>
@@ -113,6 +126,10 @@ export default function DashboardPage() {
         <td className="border p-2">2020-09-01</td>
         <td className="border p-2">29</td>
         <td className="border p-2">4 thn</td>
+<td className="border p-2 text-center">
+  <button className="bg-green-600 hover:bg-green-700 px-4 py-2 rounded transition-colors text-white mr-2">Edit</button>
+  <button className="bg-red-500 hover:bg-red-700 px-4 py-2 rounded transition-colors text-white">Delete</button>
+</td>
       </tr>
       <tr>
         <td className="border p-2 text-center">5</td>
@@ -125,6 +142,10 @@ export default function DashboardPage() {
         <td className="border p-2">2019-03-20</td>
         <td className="border p-2">32</td>
         <td className="border p-2">5 thn</td>
+<td className="border p-2 text-center">
+  <button className="bg-green-600 hover:bg-green-700 px-4 py-2 rounded transition-colors text-white mr-2">Edit</button>
+  <button className="bg-red-500 hover:bg-red-700 px-4 py-2 rounded transition-colors text-white">Delete</button>
+</td>
       </tr>
       <tr>
         <td className="border p-2 text-center">6</td>
@@ -137,6 +158,10 @@ export default function DashboardPage() {
         <td className="border p-2">2016-08-10</td>
         <td className="border p-2">36</td>
         <td className="border p-2">8 thn</td>
+<td className="border p-2 text-center">
+  <button className="bg-green-600 hover:bg-green-700 px-4 py-2 rounded transition-colors text-white mr-2">Edit</button>
+  <button className="bg-red-500 hover:bg-red-700 px-4 py-2 rounded transition-colors text-white">Delete</button>
+</td>
       </tr>
       <tr>
         <td className="border p-2 text-center">7</td>
@@ -149,6 +174,10 @@ export default function DashboardPage() {
         <td className="border p-2">2023-02-01</td>
         <td className="border p-2">27</td>
         <td className="border p-2">1 thn</td>
+<td className="border p-2 text-center">
+  <button className="bg-green-600 hover:bg-green-700 px-4 py-2 rounded transition-colors text-white mr-2">Edit</button>
+  <button className="bg-red-500 hover:bg-red-700 px-4 py-2 rounded transition-colors text-white">Delete</button>
+</td>
       </tr>
       <tr>
         <td className="border p-2 text-center">8</td>
@@ -161,6 +190,10 @@ export default function DashboardPage() {
         <td className="border p-2">2021-11-11</td>
         <td className="border p-2">30</td>
         <td className="border p-2">3 thn</td>
+<td className="border p-2 text-center">
+  <button className="bg-green-600 hover:bg-green-700 px-4 py-2 rounded transition-colors text-white mr-2">Edit</button>
+  <button className="bg-red-500 hover:bg-red-700 px-4 py-2 rounded transition-colors text-white">Delete</button>
+</td>
       </tr>
       <tr>
         <td className="border p-2 text-center">9</td>
@@ -173,6 +206,10 @@ export default function DashboardPage() {
         <td className="border p-2">2025-04-01</td>
         <td className="border p-2">22</td>
         <td className="border p-2">2 bln</td>
+<td className="border p-2 text-center">
+  <button className="bg-green-600 hover:bg-green-700 px-4 py-2 rounded transition-colors text-white mr-2">Edit</button>
+  <button className="bg-red-500 hover:bg-red-700 px-4 py-2 rounded transition-colors text-white">Delete</button>
+</td>
       </tr>
       <tr>
         <td className="border p-2 text-center">10</td>
@@ -185,6 +222,10 @@ export default function DashboardPage() {
         <td className="border p-2">2010-01-01</td>
         <td className="border p-2">50</td>
         <td className="border p-2">15 thn</td>
+<td className="border p-2 text-center">
+  <button className="bg-green-600 hover:bg-green-700 px-4 py-2 rounded transition-colors text-white mr-2">Edit</button>
+  <button className="bg-red-500 hover:bg-red-700 px-4 py-2 rounded transition-colors text-white">Delete</button>
+</td>
       </tr>
     </tbody>
   </table>
