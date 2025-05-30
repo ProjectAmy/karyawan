@@ -1,15 +1,156 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Header from "../components/Header";
 import Sidebar from "../components/Sidebar";
 import Footer from "../components/Footer";
+import { supabase } from "@/lib/supabase";
+import { useRouter } from "next/navigation";
 
 
 export default function DashboardPage() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [userName, setUserName] = useState('');
+  const [currentDate, setCurrentDate] = useState('');
+  const [karyawanData, setKaryawanData] = useState<any[]>([]);
+  const router = useRouter();
 
-  const handleLogout = () => {
-    window.location.href = "/";
+  // Fungsi untuk mendapatkan nama hari dalam bahasa Indonesia
+  const getDayName = (date: Date) => {
+    const days = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
+    return days[date.getDay()];
+  };
+
+  // Fungsi untuk mendapatkan nama bulan dalam bahasa Indonesia
+  const getMonthName = (date: Date) => {
+    const months = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
+    return months[date.getMonth()];
+  };
+
+  // Fungsi untuk format tanggal
+  const formatDate = () => {
+    const now = new Date();
+    const day = getDayName(now);
+    const date = now.getDate();
+    const month = getMonthName(now);
+    const year = now.getFullYear();
+    return `${day}, ${date} ${month} ${year}`;
+  };
+
+  // Fetch data karyawan dari Supabase
+  const fetchKaryawanData = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('karyawan')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+      if (error) {
+        throw error;
+      }
+
+      if (data) {
+        setKaryawanData(data);
+      } else {
+        console.log('No data received');
+        setKaryawanData([]);
+      }
+    } catch (error) {
+      console.error('Error fetching karyawan data:', error);
+      setKaryawanData([]);
+    }
+  };
+
+  // Update tanggal saat komponen dimuat
+  useEffect(() => {
+    setCurrentDate(formatDate());
+  }, []);
+
+  // Fetch data when component mounts
+  useEffect(() => {
+    fetchKaryawanData();
+
+    // Add a useEffect to refresh data every 30 seconds
+    const interval = setInterval(fetchKaryawanData, 30000);
+    return () => clearInterval(interval);
+  }, []);
+
+  useEffect(() => {
+    // Periksa status login dan ambil nama pengguna saat komponen dimuat
+    const checkAuth = async () => {
+      const { data: { user }, error } = await supabase.auth.getUser();
+      if (error || !user) {
+        router.push('/'); // Redirect ke halaman login jika tidak login
+        return;
+      }
+
+      // Ambil nama pengguna dari metadata atau email jika tidak ada nama
+      const name = user.user_metadata?.full_name || (user.email ? user.email.split('@')[0] : 'User');
+      setUserName(name);
+    };
+
+    checkAuth();
+  }, [router]);
+
+  const handleLogout = async () => {
+    try {
+      const { error } = await supabase.auth.signOut();
+      if (error) throw error;
+      router.push('/'); // Gunakan router.push untuk konsistensi
+    } catch (err) {
+      console.error('Error during logout:', err);
+      // Tampilkan pesan error jika diperlukan
+    }
+  };
+
+  const handleDelete = async (id: string) => {
+    if (!confirm('Apakah Anda yakin ingin menghapus data karyawan ini?')) return;
+
+    try {
+      const { error } = await supabase
+        .from('karyawan')
+        .update({ deleted_at: new Date().toISOString() })
+        .eq('id', id);
+
+      if (error) throw error;
+      
+      // Refresh data setelah berhasil menghapus
+      const { data, error: fetchError } = await supabase
+        .from('karyawan')
+        .select('*')
+        .eq('deleted_at', null);
+
+      if (fetchError) throw fetchError;
+      setKaryawanData(data || []);
+    } catch (error) {
+      console.error('Error deleting karyawan:', error);
+      alert('Gagal menghapus data karyawan. Silakan coba lagi.');
+    }
+  };
+
+  // Helper function to calculate age
+  const calculateAge = (birthDate: string): number => {
+    const today = new Date();
+    const birth = new Date(birthDate);
+    let age = today.getFullYear() - birth.getFullYear();
+    const m = today.getMonth() - birth.getMonth();
+    if (m < 0 || (m === 0 && today.getDate() < birth.getDate())) {
+      age--;
+    }
+    return age;
+  };
+
+  // Helper function to calculate work duration
+  const calculateWorkDuration = (startDate: string): string => {
+    const start = new Date(startDate);
+    const now = new Date();
+    const diff = now.getTime() - start.getTime();
+    const years = Math.floor(diff / (1000 * 60 * 60 * 24 * 365));
+    const months = Math.floor((diff % (1000 * 60 * 60 * 24 * 365)) / (1000 * 60 * 60 * 24 * 30));
+    const days = Math.floor((diff % (1000 * 60 * 60 * 24 * 30)) / (1000 * 60 * 60 * 24));
+
+    if (years > 0) return `${years} thn`;
+    if (months > 0) return `${months} bln`;
+    return `${days} hari`;
   };
 
   return (
@@ -22,214 +163,104 @@ export default function DashboardPage() {
           onClose={() => setSidebarOpen(false)}
         />
         <main className="flex-1 p-4 md:p-8 bg-gray-50">
-          <h2 className="text-xl md:text-2xl font-bold mb-4 md:mb-6 text-gray-800">Ahlan Wa Sahlan, Kamal!</h2>
+          <h2 className="text-xl md:text-2xl font-bold mb-2 md:mb-4 text-gray-800">Ahlan Wa Sahlan, {userName}!</h2>
+          <p className="text-sm text-gray-600">{currentDate}</p>
+          {karyawanData.length === 0 ? (
+            <div className="text-center text-red-500 space-y-2">
+              <p>Tidak ada data karyawan yang ditampilkan.</p>
+              <p>Hal ini bisa terjadi karena:</p>
+              <ul className="list-disc list-inside">
+                <li>Belum ada data karyawan yang dimasukkan</li>
+                <li>Semua karyawan sudah dihapus (deleted_at tidak null)</li>
+                <li>Ada masalah koneksi dengan database</li>
+              </ul>
+              <p>Silakan cek kembali di Supabase atau coba refresh halaman.</p>
+            </div>
+          ) : null}
           <div className="grid grid-cols-2 md:grid-cols-3 gap-3 mb-4">
-  <div className="bg-blue-50 rounded p-3 text-center">
-    <div className="text-xs md:text-sm text-gray-500">Jumlah Guru</div>
-    <div className="font-extrabold text-lg md:text-xl text-blue-800">6</div>
-  </div>
-  <div className="bg-blue-50 rounded p-3 text-center">
-    <div className="text-xs md:text-sm text-gray-500">Jumlah Tendik</div>
-    <div className="font-extrabold text-lg md:text-xl text-blue-800">4</div>
-  </div>
-  <div className="bg-blue-50 rounded p-3 text-center">
-    <div className="text-xs md:text-sm text-gray-500">Total Karyawan</div>
-    <div className="font-extrabold text-lg md:text-xl text-blue-800">10</div>
-  </div>
-  <div className="bg-blue-50 rounded p-3 text-center">
-    <div className="text-xs md:text-sm text-gray-500">Karyawan Percobaan</div>
-    <div className="font-extrabold text-lg md:text-xl text-blue-800">2</div>
-  </div>
-  <div className="bg-blue-50 rounded p-3 text-center">
-    <div className="text-xs md:text-sm text-gray-500">Karyawan Tidak Tetap</div>
-    <div className="font-extrabold text-lg md:text-xl text-blue-800">2</div>
-  </div>
-  <div className="bg-blue-50 rounded p-3 text-center">
-    <div className="text-xs md:text-sm text-gray-500">Karyawan Tetap</div>
-    <div className="font-extrabold text-lg md:text-xl text-blue-800">6</div>
-  </div>
-</div>
-<div className="bg-white p-2 md:p-6 rounded shadow-md text-gray-700 text-xs md:text-base overflow-x-auto">
-  <table className="min-w-[700px] w-full border-collapse">
-    <thead>
-      <tr className="bg-gray-100 text-gray-700">
-        <th className="border p-2">No</th>
-        <th className="border p-2">Nama Lengkap</th>
-        <th className="border p-2">Nomor WA</th>
-        <th className="border p-2">Status</th>
-        <th className="border p-2">Posisi</th>
-        <th className="border p-2">Keterangan</th>
-        <th className="border p-2">Jabatan</th>
-        <th className="border p-2">Awal Masuk</th>
-        <th className="border p-2">Umur</th>
-        <th className="border p-2">Masa Kerja</th>
-<th className="border p-2">Aksi</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td className="border p-2 text-center">1</td>
-        <td className="border p-2"><a href="/karyawan/ahmad-fauzi" className="text-blue-700 underline hover:text-blue-900">Ahmad Fauzi</a></td>
-        <td className="border p-2">081234567890</td>
-        <td className="border p-2">Tetap</td>
-        <td className="border p-2">Guru</td>
-        <td className="border p-2">Guru Mapel</td>
-        <td className="border p-2">Wali Kelas</td>
-        <td className="border p-2">2018-07-01</td>
-        <td className="border p-2">35</td>
-        <td className="border p-2">6 thn</td>
-        <td className="border p-2 text-center">
-          <a href="/karyawan/ahmad-fauzi/edit" className="bg-green-600 hover:bg-green-700 px-4 py-2 rounded transition-colors text-white mr-2 inline-block text-center">Edit</a>
-          <button className="bg-red-500 hover:bg-red-700 px-4 py-2 rounded transition-colors text-white">Delete</button>
-        </td>
-      </tr>
-      <tr>
-        <td className="border p-2 text-center">2</td>
-        <td className="border p-2">Siti Aminah</td>
-        <td className="border p-2">081234567891</td>
-        <td className="border p-2">Tetap</td>
-        <td className="border p-2">Tendik</td>
-        <td className="border p-2">Bendahara</td>
-        <td className="border p-2">-</td>
-        <td className="border p-2">2017-01-15</td>
-        <td className="border p-2">40</td>
-        <td className="border p-2">7 thn</td>
-<td className="border p-2 text-center">
-  <button className="bg-green-600 hover:bg-green-700 px-4 py-2 rounded transition-colors text-white mr-2">Edit</button>
-  <button className="bg-red-500 hover:bg-red-700 px-4 py-2 rounded transition-colors text-white">Delete</button>
-</td>
-      </tr>
-      <tr>
-        <td className="border p-2 text-center">3</td>
-        <td className="border p-2">Budi Santoso</td>
-        <td className="border p-2">081234567892</td>
-        <td className="border p-2">Percobaan</td>
-        <td className="border p-2">Guru</td>
-        <td className="border p-2">Guru Kelas</td>
-        <td className="border p-2">-</td>
-        <td className="border p-2">2025-01-10</td>
-        <td className="border p-2">24</td>
-        <td className="border p-2">5 bln</td>
-<td className="border p-2 text-center">
-  <button className="bg-green-600 hover:bg-green-700 px-4 py-2 rounded transition-colors text-white mr-2">Edit</button>
-  <button className="bg-red-500 hover:bg-red-700 px-4 py-2 rounded transition-colors text-white">Delete</button>
-</td>
-      </tr>
-      <tr>
-        <td className="border p-2 text-center">4</td>
-        <td className="border p-2">Dewi Lestari</td>
-        <td className="border p-2">081234567893</td>
-        <td className="border p-2">Tidak Tetap</td>
-        <td className="border p-2">Guru</td>
-        <td className="border p-2">Guru Mapel</td>
-        <td className="border p-2">Waka Kurikulum</td>
-        <td className="border p-2">2020-09-01</td>
-        <td className="border p-2">29</td>
-        <td className="border p-2">4 thn</td>
-<td className="border p-2 text-center">
-  <button className="bg-green-600 hover:bg-green-700 px-4 py-2 rounded transition-colors text-white mr-2">Edit</button>
-  <button className="bg-red-500 hover:bg-red-700 px-4 py-2 rounded transition-colors text-white">Delete</button>
-</td>
-      </tr>
-      <tr>
-        <td className="border p-2 text-center">5</td>
-        <td className="border p-2">Eka Pratama</td>
-        <td className="border p-2">081234567894</td>
-        <td className="border p-2">Tetap</td>
-        <td className="border p-2">Tendik</td>
-        <td className="border p-2">TU</td>
-        <td className="border p-2">-</td>
-        <td className="border p-2">2019-03-20</td>
-        <td className="border p-2">32</td>
-        <td className="border p-2">5 thn</td>
-<td className="border p-2 text-center">
-  <button className="bg-green-600 hover:bg-green-700 px-4 py-2 rounded transition-colors text-white mr-2">Edit</button>
-  <button className="bg-red-500 hover:bg-red-700 px-4 py-2 rounded transition-colors text-white">Delete</button>
-</td>
-      </tr>
-      <tr>
-        <td className="border p-2 text-center">6</td>
-        <td className="border p-2">Fatimah Zahra</td>
-        <td className="border p-2">081234567895</td>
-        <td className="border p-2">Tetap</td>
-        <td className="border p-2">Guru</td>
-        <td className="border p-2">Guru Kelas</td>
-        <td className="border p-2">Wali Kelas</td>
-        <td className="border p-2">2016-08-10</td>
-        <td className="border p-2">36</td>
-        <td className="border p-2">8 thn</td>
-<td className="border p-2 text-center">
-  <button className="bg-green-600 hover:bg-green-700 px-4 py-2 rounded transition-colors text-white mr-2">Edit</button>
-  <button className="bg-red-500 hover:bg-red-700 px-4 py-2 rounded transition-colors text-white">Delete</button>
-</td>
-      </tr>
-      <tr>
-        <td className="border p-2 text-center">7</td>
-        <td className="border p-2">Gilang Ramadhan</td>
-        <td className="border p-2">081234567896</td>
-        <td className="border p-2">Tidak Tetap</td>
-        <td className="border p-2">Tendik</td>
-        <td className="border p-2">OB</td>
-        <td className="border p-2">-</td>
-        <td className="border p-2">2023-02-01</td>
-        <td className="border p-2">27</td>
-        <td className="border p-2">1 thn</td>
-<td className="border p-2 text-center">
-  <button className="bg-green-600 hover:bg-green-700 px-4 py-2 rounded transition-colors text-white mr-2">Edit</button>
-  <button className="bg-red-500 hover:bg-red-700 px-4 py-2 rounded transition-colors text-white">Delete</button>
-</td>
-      </tr>
-      <tr>
-        <td className="border p-2 text-center">8</td>
-        <td className="border p-2">Hana Nuraini</td>
-        <td className="border p-2">081234567897</td>
-        <td className="border p-2">Tetap</td>
-        <td className="border p-2">Guru</td>
-        <td className="border p-2">Guru Mapel</td>
-        <td className="border p-2">-</td>
-        <td className="border p-2">2021-11-11</td>
-        <td className="border p-2">30</td>
-        <td className="border p-2">3 thn</td>
-<td className="border p-2 text-center">
-  <button className="bg-green-600 hover:bg-green-700 px-4 py-2 rounded transition-colors text-white mr-2">Edit</button>
-  <button className="bg-red-500 hover:bg-red-700 px-4 py-2 rounded transition-colors text-white">Delete</button>
-</td>
-      </tr>
-      <tr>
-        <td className="border p-2 text-center">9</td>
-        <td className="border p-2">Imam Syafii</td>
-        <td className="border p-2">081234567898</td>
-        <td className="border p-2">Percobaan</td>
-        <td className="border p-2">Tendik</td>
-        <td className="border p-2">OB</td>
-        <td className="border p-2">-</td>
-        <td className="border p-2">2025-04-01</td>
-        <td className="border p-2">22</td>
-        <td className="border p-2">2 bln</td>
-<td className="border p-2 text-center">
-  <button className="bg-green-600 hover:bg-green-700 px-4 py-2 rounded transition-colors text-white mr-2">Edit</button>
-  <button className="bg-red-500 hover:bg-red-700 px-4 py-2 rounded transition-colors text-white">Delete</button>
-</td>
-      </tr>
-      <tr>
-        <td className="border p-2 text-center">10</td>
-        <td className="border p-2">Joko Susilo</td>
-        <td className="border p-2">081234567899</td>
-        <td className="border p-2">Tetap</td>
-        <td className="border p-2">Guru</td>
-        <td className="border p-2">Guru Mapel</td>
-        <td className="border p-2">Kepsek</td>
-        <td className="border p-2">2010-01-01</td>
-        <td className="border p-2">50</td>
-        <td className="border p-2">15 thn</td>
-<td className="border p-2 text-center">
-  <button className="bg-green-600 hover:bg-green-700 px-4 py-2 rounded transition-colors text-white mr-2">Edit</button>
-  <button className="bg-red-500 hover:bg-red-700 px-4 py-2 rounded transition-colors text-white">Delete</button>
-</td>
-      </tr>
-    </tbody>
-  </table>
-</div>
+            <div className="bg-blue-50 rounded p-3 text-center">
+              <div className="text-xs md:text-sm text-gray-500">Jumlah Guru</div>
+              <div className="font-extrabold text-lg md:text-xl text-blue-800">
+                {karyawanData.filter(k => k.posisi === 'guru').length}
+              </div>
+            </div>
+            <div className="bg-blue-50 rounded p-3 text-center">
+              <div className="text-xs md:text-sm text-gray-500">Jumlah Tendik</div>
+              <div className="font-extrabold text-lg md:text-xl text-blue-800">
+                {karyawanData.filter(k => k.posisi === 'tendik').length}
+              </div>
+            </div>
+            <div className="bg-blue-50 rounded p-3 text-center">
+              <div className="text-xs md:text-sm text-gray-500">Total Karyawan</div>
+              <div className="font-extrabold text-lg md:text-xl text-blue-800">
+                {karyawanData.length}
+              </div>
+            </div>
+            <div className="bg-blue-50 rounded p-3 text-center">
+              <div className="text-xs md:text-sm text-gray-500">Karyawan Percobaan</div>
+              <div className="font-extrabold text-lg md:text-xl text-blue-800">
+                {karyawanData.filter(k => k.status === 'percobaan').length}
+              </div>
+            </div>
+            <div className="bg-blue-50 rounded p-3 text-center">
+              <div className="text-xs md:text-sm text-gray-500">Karyawan Tidak Tetap</div>
+              <div className="font-extrabold text-lg md:text-xl text-blue-800">
+                {karyawanData.filter(k => k.status === 'tidak_tetap').length}
+              </div>
+            </div>
+            <div className="bg-blue-50 rounded p-3 text-center">
+              <div className="text-xs md:text-sm text-gray-500">Karyawan Tetap</div>
+              <div className="font-extrabold text-lg md:text-xl text-blue-800">
+                {karyawanData.filter(k => k.status === 'tetap').length}
+              </div>
+            </div>
+          </div>
+          <div className="bg-white p-2 md:p-6 rounded shadow-md text-gray-700 text-xs md:text-base overflow-x-auto">
+            <table className="min-w-[700px] w-full border-collapse">
+              <thead>
+                <tr className="bg-gray-100 text-gray-700">
+                  <th className="border p-2">No</th>
+                  <th className="border p-2">Nama Lengkap</th>
+                  <th className="border p-2">Nomor WA</th>
+                  <th className="border p-2">Umur</th>
+                  <th className="border p-2">Masa Kerja</th>
+                  <th className="border p-2">Aksi</th>
+                </tr>
+              </thead>
+              <tbody>
+                {karyawanData.map((karyawan, index) => (
+                  <tr key={karyawan.id}>
+                    <td className="border p-2 text-center">{index + 1}</td>
+                    <td className="border p-2">
+                      <a 
+                        href={`/karyawan/${karyawan.id}`} 
+                        className="text-blue-700 underline hover:text-blue-900"
+                      >
+                        {karyawan.nama}
+                      </a>
+                    </td>
+                    <td className="border p-2">{karyawan.wa}</td>
+                    <td className="border p-2">{calculateAge(karyawan.tanggal_lahir)}</td>
+                    <td className="border p-2">{calculateWorkDuration(karyawan.awal_masuk)}</td>
+                    <td className="border p-2 text-center">
+                      <a 
+                        href={`/karyawan/${karyawan.id}/edit`} 
+                        className="bg-green-600 hover:bg-green-700 px-4 py-2 rounded transition-colors text-white mr-2 inline-block text-center"
+                      >
+                        Edit
+                      </a>
+                      <button 
+                        className="bg-red-500 hover:bg-red-700 px-4 py-2 rounded transition-colors text-white"
+                        onClick={() => handleDelete(karyawan.id)}
+                      >
+                        Delete
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </main>
       </div>
       <Footer />

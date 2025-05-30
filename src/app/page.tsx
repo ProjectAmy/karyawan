@@ -1,15 +1,29 @@
 "use client"
 import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { supabase } from "@/lib/supabase";
 
 export default function Home() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-  // const [error, setError] = useState("");
+  const [error, setError] = useState("");
+  const router = useRouter();
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Sementara langsung redirect ke dashboard
-    window.location.href = "/dashboard";
+    try {
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email: username,
+        password: password,
+      });
+
+      if (error) throw error;
+      
+      // Redirect to dashboard if login is successful
+      router.push("/dashboard");
+    } catch (err: Error | unknown) {
+      setError(err instanceof Error ? err.message : 'An unexpected error occurred');
+    }
   };
 
   return (
@@ -19,9 +33,14 @@ export default function Home() {
         className="bg-white p-8 rounded-lg shadow-lg flex flex-col gap-5 w-full max-w-sm border border-gray-200"
       >
         <h1 className="text-3xl font-extrabold mb-6 text-center text-gray-800">H.R.D</h1>
+        {error && (
+          <div className="text-red-500 text-sm mb-3 text-center">
+            {error}
+          </div>
+        )}
         <input
-          type="text"
-          placeholder="Username"
+          type="email"
+          placeholder="Email"
           value={username}
           onChange={(e) => setUsername(e.target.value)}
           className="border border-gray-400 text-gray-800 placeholder-gray-400 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-base"
