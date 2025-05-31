@@ -249,7 +249,7 @@ export default function DashboardPage() {
             <div className="overflow-x-auto">
               <div className="min-w-full md:w-full">
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 p-4 sm:hidden">
-                  {karyawanData.map((karyawan, idx) => (
+                  {karyawanData.map((karyawan) => (
                     <div key={karyawan.id} className="border rounded-lg overflow-hidden">
                       <div className="bg-green-600 p-3">
                         <a href={`/karyawan/${karyawan.id}`} className="text-white font-semibold hover:underline block">
