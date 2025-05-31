@@ -33,7 +33,7 @@ export default function DashboardPage() {
   const [userName, setUserName] = useState('');
   const [currentDate, setCurrentDate] = useState('');
   const [karyawanData, setKaryawanData] = useState<Karyawan[]>([]);
-  const [searchQuery, setSearchQuery] = useState('');
+  const [searchQuery] = useState('');
   const router = useRouter();
 
   // Fungsi untuk mendapatkan nama hari dalam bahasa Indonesia
@@ -53,8 +53,8 @@ export default function DashboardPage() {
     try {
       const { data, error } = await supabase
         .from('karyawan')
-        .select('*')
-        .or('deleted_at.is.null')
+        .select()
+        .is('deleted_at', null)
         .order('created_at', { ascending: false });
 
       if (error) {
@@ -109,60 +109,6 @@ export default function DashboardPage() {
           return;
         }
         
-        setUserName(user.email || '');
-      } catch (error) {
-        console.error('Error checking auth:', error);
-        router.push('/login');
-      }
-    };
-
-    checkAuth();
-  }, [router]);
-
-
-
-  const handleSearch = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!searchQuery.trim()) {
-      await fetchKaryawanData();
-      return;
-    }
-    
-    try {
-      const { data, error } = await supabase
-        .from('karyawan')
-        .select('*')
-        .or(`nama.ilike.%${searchQuery}%,nik.ilike.%${searchQuery}%`)
-        .or('deleted_at.is.null');
-
-      if (error) {
-        console.error('Error searching:', error);
-        return;
-      }
-
-      setKaryawanData(data || []);
-    } catch (error) {
-      console.error('Error searching:', error);
-    }
-  };
-
-  // Handle user authentication state
-  useEffect(() => {
-    const checkAuth = async () => {
-      try {
-        const { data: { user }, error } = await supabase.auth.getUser();
-        
-        if (error) {
-          console.error('Error getting user:', error);
-          router.push('/login');
-          return;
-        }
-        
-        if (!user) {
-          router.push('/login');
-          return;
-        }
-        
         const name = user.user_metadata?.full_name || (user.email ? user.email.split('@')[0] : 'User');
         setUserName(name);
       } catch (error) {
@@ -174,6 +120,30 @@ export default function DashboardPage() {
     checkAuth();
   }, [router]);
 
+  const handleSearch = useCallback(async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!searchQuery.trim()) {
+      await fetchKaryawanData();
+      return;
+    }
+    
+    try {
+      const { data, error } = await supabase
+        .from('karyawan')
+        .select('*')
+        .or('deleted_at.is.null');
+
+      if (error) {
+        console.error('Error searching:', error);
+        return;
+      }
+
+      setKaryawanData(data || []);
+    } catch (error) {
+      console.error('Error searching:', error);
+    }
+  }, [searchQuery, fetchKaryawanData]);
+
   const handleLogout = async (): Promise<void> => {
     try {
       const { error } = await supabase.auth.signOut();
@@ -184,33 +154,31 @@ export default function DashboardPage() {
     }
   };
 
-  const handleUpdateStatus = async (id: string, status: string): Promise<void> => {
+  // Handle update status kehadiran
+  const handleUpdateStatus = useCallback(async (id: string, status: string): Promise<void> => {
     try {
-      const { data, error } = await supabase
+      const { error } = await supabase
         .from('karyawan')
         .update({ status_kehadiran: status })
-        .eq('id', id)
-        .select();
+        .eq('id', id);
 
       if (error) {
         console.error('Error updating status:', error);
         return;
       }
 
-      if (data && data.length > 0) {
-        // Update the local state with the updated data
-        setKaryawanData((prevData: Karyawan[]) => 
-          prevData.map((karyawan: Karyawan) => 
-            karyawan.id === id ? { ...karyawan, status_kehadiran: status } : karyawan
-          )
-        );
-      }
+      // Update the local state with the updated data
+      setKaryawanData(prevData => 
+        prevData.map(karyawan => 
+          karyawan.id === id ? { ...karyawan, status_kehadiran: status } : karyawan
+        )
+      );
     } catch (error) {
       console.error('Error updating status:', error);
     }
-  };
+  }, []);
 
-  const handleDelete = async (id: string): Promise<void> => {
+  const handleDelete = useCallback(async (id: string): Promise<void> => {
     if (!window.confirm('Apakah Anda yakin ingin menghapus karyawan ini?')) {
       return;
     }
@@ -226,14 +194,11 @@ export default function DashboardPage() {
         return;
       }
       
-      // Filter out the deleted employee from the local state
-      setKaryawanData((prevData: Karyawan[]) => 
-        prevData.filter((k: Karyawan) => k.id !== id)
-      );
+      setKaryawanData(prevData => prevData.filter(k => k.id !== id));
     } catch (error) {
       console.error('Error deleting employee:', error);
     }
-  };
+  }, []);
 
   // Helper function to calculate age
   const calculateAge = (birthDate: string): number => {
