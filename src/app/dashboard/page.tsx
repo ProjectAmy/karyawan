@@ -196,8 +196,8 @@ export default function DashboardPage() {
     const months = Math.floor((diff % (1000 * 60 * 60 * 24 * 365)) / (1000 * 60 * 60 * 24 * 30));
     const days = Math.floor((diff % (1000 * 60 * 60 * 24 * 30)) / (1000 * 60 * 60 * 24));
 
-    if (years > 0) return `${years} thn`;
-    if (months > 0) return `${months} bln`;
+    if (years > 0) return `${years} tahun`;
+    if (months > 0) return `${months} bulan`;
     return `${days} hari`;
   };
 

@@ -25,6 +25,10 @@ interface Karyawan {
   foto: string | null;
   unit: string;
   keterangan?: string;
+  foto_ktp?: string | null;
+  foto_kk?: string | null;
+  foto_buku_nikah?: string | null;
+  foto_akte_anak?: string | null;
 }
 
 export default function DetailKaryawan() {
@@ -205,10 +209,13 @@ export default function DetailKaryawan() {
               {/* Header Profil */}
               <div className="bg-green-700 p-6 text-white">
                 <div className="flex flex-col md:flex-row md:items-center md:justify-between">
-                  <div>
-                    <h1 className="text-2xl font-bold">{karyawan.nama}</h1>
+                  <div className="space-y-2 md:space-y-3">
+                    <h1 className="text-2xl md:text-3xl font-bold">{karyawan.nama}</h1>
                     {karyawan.keterangan && (
-                      <p className="text-green-100 font-medium">{karyawan.keterangan} {karyawan.unit}</p>
+                      <p className="text-green-100 font-medium text-base md:text-lg">
+                        {karyawan.keterangan.charAt(0).toUpperCase() + karyawan.keterangan.slice(1)}
+                        {karyawan.unit && ` ${karyawan.unit.charAt(0).toUpperCase() + karyawan.unit.slice(1)}`}
+                      </p>
                     )}
                   </div>
                   {karyawan.foto && (
@@ -229,11 +236,11 @@ export default function DetailKaryawan() {
               </div>
 
               {/* Container untuk Informasi Pribadi dan Pekerjaan */}
-              <div className="p-6 space-y-6">
+              <div className="p-10 space-y-6">
                 {/* Informasi Pribadi */}
                 <div className="space-y-4">
-                  <h2 className="text-xl font-bold text-gray-900 border-b-2 border-gray-200 pb-2">Informasi Pribadi</h2>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <h2 className="text-xl font-bold text-gray-900 border-b-2 border-black-200 pb-5 mb-10">Informasi Pribadi</h2>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
                       <p className="text-sm font-medium text-gray-700">Tanggal Lahir</p>
                       <p className="font-semibold text-gray-900">{formatDate(karyawan.tanggal_lahir)}</p>
@@ -278,9 +285,9 @@ export default function DetailKaryawan() {
                 </div>
 
                 {/* Informasi Pekerjaan */}
-                <div className="space-y-4 pt-4 border-t border-gray-200">
-                  <h2 className="text-xl font-bold text-gray-900 border-b-2 border-gray-200 pb-2">Informasi Pekerjaan</h2>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-4 pt-10 border-t border-gray-200">
+                  <h2 className="text-xl font-bold text-gray-900 border-b-2 border-black-200 pb-5 mb-10">Informasi Pekerjaan</h2>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
                       <p className="text-sm font-medium text-gray-700">Posisi</p>
                       <p className="font-semibold text-gray-900">{karyawan.posisi || '-'}</p>
@@ -313,6 +320,108 @@ export default function DetailKaryawan() {
                           : '-'}
                       </p>
                     </div>
+                  </div>
+                </div>
+
+                {/* Informasi Berkas */}
+                <div className="space-y-4 pt-10 border-t border-gray-200">
+                  <h2 className="text-xl font-bold text-gray-900 border-b-2 border-black-200 pb-5 mb-10">Berkas</h2>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    {karyawan.foto_ktp && (
+                      <div>
+                        <p className="text-sm font-medium text-gray-700 mb-2">KTP</p>
+                        <a 
+                          href={karyawan.foto_ktp} 
+                          target="_blank" 
+                          rel="noopener noreferrer"
+                          className="inline-block"
+                        >
+                          <div className="w-32 h-20 bg-gray-100 rounded-md overflow-hidden border border-gray-200 flex items-center justify-center">
+                            <Image 
+                              src={karyawan.foto_ktp}
+                              alt="KTP"
+                              width={128}
+                              height={80}
+                              className="w-full h-full object-cover"
+                              unoptimized={true}
+                            />
+                          </div>
+                          <p className="text-xs text-blue-600 hover:underline mt-1">Lihat KTP</p>
+                        </a>
+                      </div>
+                    )}
+                    
+                    {karyawan.foto_kk && (
+                      <div>
+                        <p className="text-sm font-medium text-gray-700 mb-2">Kartu Keluarga</p>
+                        <a 
+                          href={karyawan.foto_kk} 
+                          target="_blank" 
+                          rel="noopener noreferrer"
+                          className="inline-block"
+                        >
+                          <div className="w-32 h-20 bg-gray-100 rounded-md overflow-hidden border border-gray-200 flex items-center justify-center">
+                            <Image 
+                              src={karyawan.foto_kk}
+                              alt="Kartu Keluarga"
+                              width={128}
+                              height={80}
+                              className="w-full h-full object-cover"
+                              unoptimized={true}
+                            />
+                          </div>
+                          <p className="text-xs text-blue-600 hover:underline mt-1">Lihat KK</p>
+                        </a>
+                      </div>
+                    )}
+                    
+                    {karyawan.foto_buku_nikah && (
+                      <div>
+                        <p className="text-sm font-medium text-gray-700 mb-2">Buku Nikah</p>
+                        <a 
+                          href={karyawan.foto_buku_nikah} 
+                          target="_blank" 
+                          rel="noopener noreferrer"
+                          className="inline-block"
+                        >
+                          <div className="w-32 h-20 bg-gray-100 rounded-md overflow-hidden border border-gray-200 flex items-center justify-center">
+                            <Image 
+                              src={karyawan.foto_buku_nikah}
+                              alt="Buku Nikah"
+                              width={128}
+                              height={80}
+                              className="w-full h-full object-cover"
+                              unoptimized={true}
+                            />
+                          </div>
+                          <p className="text-xs text-blue-600 hover:underline mt-1">Lihat Buku Nikah</p>
+                        </a>
+                      </div>
+                    )}
+                    
+                    {karyawan.foto_akte_anak && (
+                      <div>
+                        <p className="text-sm font-medium text-gray-700 mb-2">Akte Anak</p>
+                        <a 
+                          href={karyawan.foto_akte_anak} 
+                          target="_blank" 
+                          rel="noopener noreferrer"
+                          className="inline-block"
+                        >
+                          <div className="w-32 h-20 bg-gray-100 rounded-md overflow-hidden border border-gray-200 flex items-center justify-center">
+                            <Image 
+                              src={karyawan.foto_akte_anak}
+                              alt="Akte Anak"
+                              width={128}
+                              height={80}
+                              className="w-full h-full object-cover"
+                              unoptimized={true}
+                            />
+                          </div>
+                          <p className="text-xs text-blue-600 hover:underline mt-1">Lihat Akte Anak</p>
+                        </a>
+                      </div>
+                    )}
                   </div>
                 </div>
               </div>
