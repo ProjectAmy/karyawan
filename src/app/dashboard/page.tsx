@@ -120,30 +120,6 @@ export default function DashboardPage() {
     checkAuth();
   }, [router]);
 
-  const handleSearch = useCallback(async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!searchQuery.trim()) {
-      await fetchKaryawanData();
-      return;
-    }
-    
-    try {
-      const { data, error } = await supabase
-        .from('karyawan')
-        .select('*')
-        .or('deleted_at.is.null');
-
-      if (error) {
-        console.error('Error searching:', error);
-        return;
-      }
-
-      setKaryawanData(data || []);
-    } catch (error) {
-      console.error('Error searching:', error);
-    }
-  }, [searchQuery, fetchKaryawanData]);
-
   const handleLogout = async (): Promise<void> => {
     try {
       const { error } = await supabase.auth.signOut();
@@ -155,6 +131,8 @@ export default function DashboardPage() {
   };
 
   // Handle update status kehadiran
+  // Note: This function is currently unused but kept for future implementation
+  /*
   const handleUpdateStatus = useCallback(async (id: string, status: string): Promise<void> => {
     try {
       const { error } = await supabase
@@ -167,16 +145,14 @@ export default function DashboardPage() {
         return;
       }
 
-      // Update the local state with the updated data
-      setKaryawanData(prevData => 
-        prevData.map(karyawan => 
-          karyawan.id === id ? { ...karyawan, status_kehadiran: status } : karyawan
-        )
+      setKaryawanData(prevData =>
+        prevData.map(k => (k.id === id ? { ...k, status_kehadiran: status } : k))
       );
     } catch (error) {
       console.error('Error updating status:', error);
     }
   }, []);
+  */
 
   const handleDelete = useCallback(async (id: string): Promise<void> => {
     if (!window.confirm('Apakah Anda yakin ingin menghapus karyawan ini?')) {

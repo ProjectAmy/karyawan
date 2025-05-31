@@ -75,6 +75,6 @@ const supabase = isBrowser && supabaseUrl && supabaseAnonKey
           error: null
         })
       })
-    } as any; // Use type assertion here to avoid complex type definitions
+    } as unknown as ReturnType<typeof createClient>; // Proper type for mock client
 
 export { supabase };
