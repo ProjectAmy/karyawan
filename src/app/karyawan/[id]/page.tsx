@@ -40,6 +40,18 @@ export default function DetailKaryawan() {
   
   const [sidebarOpen, setSidebarOpen] = useState(false);
   
+  // Check if user is authenticated
+  useEffect(() => {
+    const checkAuth = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
+        router.push('/');
+      }
+    };
+    
+    checkAuth();
+  }, [router]);
+  
   // Handle logout
   const handleLogout = async () => {
     await supabase.auth.signOut();

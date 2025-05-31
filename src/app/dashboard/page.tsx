@@ -225,15 +225,8 @@ export default function DashboardPage() {
           <h2 className="text-xl md:text-2xl font-bold mb-2 md:mb-3 text-gray-800">Ahlan Wa Sahlan, {userName}!</h2>
           <p className="text-sm text-gray-600 mb-4 md:mb-6">{currentDate}</p>
           {karyawanData.length === 0 ? (
-            <div className="text-center text-red-500 space-y-2">
+            <div className="text-center text-green-500 space-y-2">
               <p>Tidak ada data karyawan yang ditampilkan.</p>
-              <p>Hal ini bisa terjadi karena:</p>
-              <ul className="list-disc list-inside">
-                <li>Belum ada data karyawan yang dimasukkan</li>
-                <li>Semua karyawan sudah dihapus (deleted_at tidak null)</li>
-                <li>Ada masalah koneksi dengan database</li>
-              </ul>
-              <p>Silakan cek kembali di Supabase atau coba refresh halaman.</p>
             </div>
           ) : null}
           {/* Kartu Statistik */}
