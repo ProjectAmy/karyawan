@@ -33,7 +33,6 @@ export default function DashboardPage() {
   const [userName, setUserName] = useState('');
   const [currentDate, setCurrentDate] = useState('');
   const [karyawanData, setKaryawanData] = useState<Karyawan[]>([]);
-  const [searchQuery] = useState('');
   const router = useRouter();
 
   // Fungsi untuk mendapatkan nama hari dalam bahasa Indonesia
