@@ -211,8 +211,8 @@ export default function DashboardPage() {
           onClose={() => setSidebarOpen(false)}
         />
         <main className="flex-1 p-4 md:p-8 bg-gray-50">
-          <h2 className="text-xl md:text-2xl font-bold mb-2 md:mb-4 text-gray-800">Ahlan Wa Sahlan, {userName}!</h2>
-          <p className="text-sm text-gray-600">{currentDate}</p>
+          <h2 className="text-xl md:text-2xl font-bold mb-2 md:mb-3 text-gray-800">Ahlan Wa Sahlan, {userName}!</h2>
+          <p className="text-sm text-gray-600 mb-4 md:mb-6">{currentDate}</p>
           {karyawanData.length === 0 ? (
             <div className="text-center text-red-500 space-y-2">
               <p>Tidak ada data karyawan yang ditampilkan.</p>
@@ -225,109 +225,142 @@ export default function DashboardPage() {
               <p>Silakan cek kembali di Supabase atau coba refresh halaman.</p>
             </div>
           ) : null}
-          <div className="grid grid-cols-2 md:grid-cols-3 gap-3 mb-4">
-            <div className="bg-blue-50 rounded p-3 text-center">
-              <div className="text-xs md:text-sm text-gray-500">Jumlah Guru</div>
-              <div className="font-extrabold text-lg md:text-xl text-blue-800">
-                {karyawanData.filter(k => k.posisi === 'guru').length}
+          {/* Kartu Statistik */}
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-2 sm:gap-3 mb-4">
+            {[
+              { title: 'Guru', count: karyawanData.filter(k => k.posisi === 'guru').length, icon: '👨‍🏫' },
+              { title: 'Tendik', count: karyawanData.filter(k => k.posisi === 'tendik').length, icon: '👨‍💼' },
+              { title: 'Total Karyawan', count: karyawanData.length, icon: '👥' },
+              { title: 'Percobaan', count: karyawanData.filter(k => k.status === 'percobaan').length, icon: '⏳' },
+              { title: 'Tidak Tetap', count: karyawanData.filter(k => k.status === 'tidak_tetap').length, icon: '📝' },
+              { title: 'Tetap', count: karyawanData.filter(k => k.status === 'tetap').length, icon: '✅' },
+            ].map((item, index) => (
+              <div key={index} className="bg-white rounded-lg p-2 sm:p-3 text-center border-2 border-green-100 hover:border-green-200 hover:shadow-md transition-all duration-200">
+                <div className="text-2xl mb-1">{item.icon}</div>
+                <div className="text-xs sm:text-sm text-gray-600 font-medium">{item.title}</div>
+                <div className="font-extrabold text-base sm:text-lg md:text-xl text-green-700 mt-1">
+                  {item.count}
+                </div>
               </div>
-            </div>
-            <div className="bg-blue-50 rounded p-3 text-center">
-              <div className="text-xs md:text-sm text-gray-500">Jumlah Tendik</div>
-              <div className="font-extrabold text-lg md:text-xl text-blue-800">
-                {karyawanData.filter(k => k.posisi === 'tendik').length}
-              </div>
-            </div>
-            <div className="bg-blue-50 rounded p-3 text-center">
-              <div className="text-xs md:text-sm text-gray-500">Total Karyawan</div>
-              <div className="font-extrabold text-lg md:text-xl text-blue-800">
-                {karyawanData.length}
-              </div>
-            </div>
-            <div className="bg-blue-50 rounded p-3 text-center">
-              <div className="text-xs md:text-sm text-gray-500">Karyawan Percobaan</div>
-              <div className="font-extrabold text-lg md:text-xl text-blue-800">
-                {karyawanData.filter(k => k.status === 'percobaan').length}
-              </div>
-            </div>
-            <div className="bg-blue-50 rounded p-3 text-center">
-              <div className="text-xs md:text-sm text-gray-500">Karyawan Tidak Tetap</div>
-              <div className="font-extrabold text-lg md:text-xl text-blue-800">
-                {karyawanData.filter(k => k.status === 'tidak_tetap').length}
-              </div>
-            </div>
-            <div className="bg-blue-50 rounded p-3 text-center">
-              <div className="text-xs md:text-sm text-gray-500">Karyawan Tetap</div>
-              <div className="font-extrabold text-lg md:text-xl text-blue-800">
-                {karyawanData.filter(k => k.status === 'tetap').length}
-              </div>
-            </div>
+            ))}
           </div>
-          <div className="bg-white p-2 md:p-6 rounded shadow-md text-gray-700 text-xs md:text-base overflow-x-auto">
-            <table className="min-w-[700px] w-full border-collapse">
-              <thead>
-                <tr className="bg-gray-100 text-gray-700">
-                  <th className="border p-2">No</th>
-                  <th className="border p-2">Nama Lengkap</th>
-                  <th className="border p-2">Nomor WA</th>
-                  <th className="border p-2">Umur</th>
-                  <th className="border p-2">Masa Kerja</th>
-                  <th className="border p-2">Aksi</th>
-                </tr>
-              </thead>
-              <tbody>
-                {karyawanData.map((karyawan, index) => (
-                  <tr key={karyawan.id}>
-                    <td className="border p-2 text-center">{index + 1}</td>
-                    <td className="border p-2">
-                      <a 
-                        href={`/karyawan/${karyawan.id}`} 
-                        className="text-blue-700 underline hover:text-blue-900"
-                      >
-                        {karyawan.nama}
-                      </a>
-                    </td>
-                    <td className="border p-2">
-                      {karyawan.wa && (() => {
-                        // Hapus semua karakter non-angka
-                        const cleanNumber = karyawan.wa.replace(/[^0-9]/g, '');
-                        // Jika dimulai dengan 0, ganti dengan 62
-                        const formattedNumber = cleanNumber.startsWith('0') 
-                          ? '62' + cleanNumber.substring(1) 
-                          : cleanNumber;
-                        
-                        return (
+          {/* Tabel Responsif */}
+          <div className="bg-white rounded-lg shadow-md overflow-hidden">
+            <div className="overflow-x-auto">
+              <div className="min-w-full md:w-full">
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 p-4 sm:hidden">
+                  {karyawanData.map((karyawan, index) => (
+                    <div key={karyawan.id} className="border rounded-lg overflow-hidden">
+                      <div className="bg-green-600 p-3">
+                        <a href={`/karyawan/${karyawan.id}`} className="text-white font-semibold hover:underline block">
+                          {karyawan.nama}
+                        </a>
+                      </div>
+                      <div className="p-3 space-y-2">
+                        <div className="text-sm">
+                          <span className="text-gray-500">No. WA: </span>
+                          {karyawan.wa && (
+                            <a 
+                              href={`https://wa.me/${karyawan.wa.replace(/[^0-9]/g, '').replace(/^0/, '62')}`}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="text-green-600 hover:underline"
+                            >
+                              {karyawan.wa}
+                            </a>
+                          )}
+                        </div>
+                        <div className="text-sm text-gray-800">
+                          <span className="text-gray-500">Umur: </span>
+                          <span className="font-medium">{karyawan.tanggal_lahir ? calculateAge(karyawan.tanggal_lahir) : '-'}</span>
+                        </div>
+                        <div className="text-sm text-gray-800">
+                          <span className="text-gray-500">Masa Kerja: </span>
+                          <span className="font-medium">{karyawan.awal_masuk ? calculateWorkDuration(karyawan.awal_masuk) : '-'}</span>
+                        </div>
+                        <div className="flex space-x-2 mt-2">
                           <a 
-                            href={`https://wa.me/${formattedNumber}`}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="text-blue-600 hover:text-blue-800 hover:underline"
+                            href={`/karyawan/${karyawan.id}/edit`} 
+                            className="flex-1 bg-blue-600 hover:bg-blue-700 px-2 py-1 rounded text-white text-center text-sm"
                           >
-                            {karyawan.wa}
+                            Edit
                           </a>
-                        );
-                      })()}
-                    </td>
-                    <td className="border p-2">{karyawan.tanggal_lahir ? calculateAge(karyawan.tanggal_lahir) : '-'}</td>
-                    <td className="border p-2">{karyawan.awal_masuk ? calculateWorkDuration(karyawan.awal_masuk) : '-'}</td>
-                    <td className="border p-2 text-center">
-                      <a 
-                        href={`/karyawan/${karyawan.id}/edit`} 
-                        className="bg-green-600 hover:bg-green-700 px-4 py-2 rounded transition-colors text-white mr-2 inline-block text-center"
-                      >
-                        Edit
-                      </a>
-                      <button 
-                        className="bg-red-500 hover:bg-red-700 px-4 py-2 rounded transition-colors text-white"
-                        onClick={() => handleDelete(karyawan.id)}
-                      >
-                        Delete
-                      </button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+                          <button 
+                            onClick={() => handleDelete(karyawan.id)}
+                            className="flex-1 bg-red-500 hover:bg-red-600 px-2 py-1 rounded text-white text-sm"
+                          >
+                            Hapus
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+                
+                {/* Tabel untuk layar menengah ke atas */}
+                <table className="hidden sm:table w-full border-collapse">
+                  <thead>
+                    <tr className="bg-green-600">
+                      <th className="border-b p-2 text-left text-sm font-medium text-white">No</th>
+                      <th className="border-b p-2 text-left text-sm font-medium text-white">Nama Lengkap</th>
+                      <th className="border-b p-2 text-left text-sm font-medium text-white">Nomor WA</th>
+                      <th className="border-b p-2 text-left text-sm font-medium text-white">Umur</th>
+                      <th className="border-b p-2 text-left text-sm font-medium text-white">Masa Kerja</th>
+                      <th className="border-b p-2 text-center text-sm font-medium text-white">Aksi</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-gray-200">
+                    {karyawanData.map((karyawan, index) => (
+                      <tr key={karyawan.id} className="hover:bg-gray-50">
+                        <td className="p-3 text-sm text-gray-700">{index + 1}</td>
+                        <td className="p-3 text-sm">
+                          <a 
+                            href={`/karyawan/${karyawan.id}`} 
+                            className="text-green-700 hover:text-green-900 hover:underline font-medium"
+                          >
+                            {karyawan.nama}
+                          </a>
+                        </td>
+                        <td className="p-3 text-sm">
+                          {karyawan.wa && (
+                            <a 
+                              href={`https://wa.me/${karyawan.wa.replace(/[^0-9]/g, '').replace(/^0/, '62')}`}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="text-green-600 hover:text-green-800 hover:underline"
+                            >
+                              {karyawan.wa}
+                            </a>
+                          )}
+                        </td>
+                        <td className="p-3 text-sm text-gray-700">
+                          {karyawan.tanggal_lahir ? calculateAge(karyawan.tanggal_lahir) : '-'}
+                        </td>
+                        <td className="p-3 text-sm text-gray-700">
+                          {karyawan.awal_masuk ? calculateWorkDuration(karyawan.awal_masuk) : '-'}
+                        </td>
+                        <td className="p-3 text-sm text-center">
+                          <div className="flex justify-center space-x-2">
+                            <a 
+                              href={`/karyawan/${karyawan.id}/edit`} 
+                              className="bg-blue-600 hover:bg-blue-700 px-3 py-1 rounded text-white text-sm transition-colors"
+                            >
+                              Edit
+                            </a>
+                            <button 
+                              onClick={() => handleDelete(karyawan.id)}
+                              className="bg-red-500 hover:bg-red-600 px-3 py-1 rounded text-white text-sm transition-colors"
+                            >
+                              Hapus
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
           </div>
         </main>
       </div>

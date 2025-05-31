@@ -15,6 +15,10 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "Dashboard HRD",
   description: "Dashboard HRD untuk manajemen data karyawan",
+  icons: {
+    icon: "/images/logoalirsyad.png",
+    apple: "/images/logoalirsyad.png",
+  },
 };
 
 export default function RootLayout({
@@ -24,6 +28,14 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
+      <head>
+        {/* Favicon utama */}
+        <link rel="icon" href="/images/favicon.ico" type="image/x-icon" />
+        <link rel="shortcut icon" href="/images/favicon.ico" type="image/x-icon" />
+        
+        {/* Fallback ke PNG jika diperlukan */}
+        <link rel="icon" type="image/png" href="/images/logoalirsyad.png" />
+      </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >

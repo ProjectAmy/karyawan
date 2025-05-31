@@ -120,6 +120,27 @@ export default function DetailKaryawan() {
       : cleanNumber;
   };
 
+  // Fungsi untuk menghitung umur dari tanggal lahir
+  const calculateAge = (birthDate: string): string => {
+    if (!birthDate) return '-';
+    
+    try {
+      const birth = new Date(birthDate);
+      const today = new Date();
+      let age = today.getFullYear() - birth.getFullYear();
+      const monthDiff = today.getMonth() - birth.getMonth();
+      
+      if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birth.getDate())) {
+        age--;
+      }
+      
+      return age > 0 ? `${age} Tahun` : '-';
+    } catch (error) {
+      console.error('Error calculating age:', error);
+      return '-';
+    }
+  };
+
   // Show loading state
   if (loading) {
     return (
@@ -146,7 +167,7 @@ export default function DetailKaryawan() {
           <p>Data karyawan tidak ditemukan</p>
           <button 
             onClick={() => router.push('/dashboard')}
-            className="mt-4 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+            className="mt-4 px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700"
           >
             Kembali ke Dashboard
           </button>
@@ -171,7 +192,7 @@ export default function DetailKaryawan() {
             {/* Tombol Kembali */}
             <button 
               onClick={() => router.back()}
-              className="flex items-center text-blue-600 hover:text-blue-800"
+              className="flex items-center text-green-600 hover:text-green-800"
             >
               <svg className="w-5 h-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
@@ -182,12 +203,12 @@ export default function DetailKaryawan() {
             {/* Card Profil */}
             <div className="bg-white rounded-lg shadow overflow-hidden">
               {/* Header Profil */}
-              <div className="bg-blue-700 p-6 text-white">
+              <div className="bg-green-700 p-6 text-white">
                 <div className="flex flex-col md:flex-row md:items-center md:justify-between">
                   <div>
                     <h1 className="text-2xl font-bold">{karyawan.nama}</h1>
                     {karyawan.keterangan && (
-                      <p className="text-blue-100 font-medium">{karyawan.keterangan} {karyawan.unit}</p>
+                      <p className="text-green-100 font-medium">{karyawan.keterangan} {karyawan.unit}</p>
                     )}
                   </div>
                   {karyawan.foto && (
@@ -217,16 +238,17 @@ export default function DetailKaryawan() {
                       <p className="text-sm font-medium text-gray-700">Tanggal Lahir</p>
                       <p className="font-semibold text-gray-900">{formatDate(karyawan.tanggal_lahir)}</p>
                     </div>
+                    <div className="mt-1">
+                        <p className="text-sm font-medium text-gray-700">Umur:</p>
+                        <p className="font-semibold text-gray-900">{calculateAge(karyawan.tanggal_lahir)}</p>
+                      </div>
                     <div>
-                      <p className="text-sm font-medium text-gray-700">No. WhatsApp</p>
-                      <a 
-                        href={`https://wa.me/${formatWA(karyawan.wa)}`}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-blue-700 hover:text-blue-900 hover:underline font-medium"
-                      >
-                        {karyawan.wa}
-                      </a>
+                      <p className="text-sm font-medium text-gray-700">No. KTP</p>
+                      <p className="font-semibold text-gray-900">{karyawan.no_ktp || '-'}</p>
+                    </div>
+                    <div>
+                      <p className="text-sm font-medium text-gray-700">No. KK</p>
+                      <p className="font-semibold text-gray-900">{karyawan.no_kk || '-'}</p>
                     </div>
                     <div>
                       <p className="text-sm font-medium text-gray-700">Email</p>
@@ -238,16 +260,19 @@ export default function DetailKaryawan() {
                       </a>
                     </div>
                     <div>
+                      <p className="text-sm font-medium text-gray-700">No. WhatsApp</p>
+                      <a 
+                        href={`https://wa.me/${formatWA(karyawan.wa)}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-blue-700 hover:text-blue-900 hover:underline font-medium"
+                      >
+                        {karyawan.wa}
+                      </a>
+                    </div>
+                    <div className="md:col-span-2">
                       <p className="text-sm font-medium text-gray-700">Alamat</p>
-                      <p className="whitespace-pre-line text-gray-900">{karyawan.alamat || '-'}</p>
-                    </div>
-                    <div>
-                      <p className="text-sm font-medium text-gray-700">No. KK</p>
-                      <p className="font-semibold text-gray-900">{karyawan.no_kk || '-'}</p>
-                    </div>
-                    <div>
-                      <p className="text-sm font-medium text-gray-700">No. KTP</p>
-                      <p className="font-semibold text-gray-900">{karyawan.no_ktp || '-'}</p>
+                      <p className="font-semibold text-gray-900">{karyawan.alamat || '-'}</p>
                     </div>
                   </div>
                 </div>
@@ -257,12 +282,12 @@ export default function DetailKaryawan() {
                   <h2 className="text-xl font-bold text-gray-900 border-b-2 border-gray-200 pb-2">Informasi Pekerjaan</h2>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                      <p className="text-sm font-medium text-gray-700">Jabatan</p>
-                      <p className="font-semibold text-gray-900">{karyawan.jabatan || '-'}</p>
-                    </div>
-                    <div>
                       <p className="text-sm font-medium text-gray-700">Posisi</p>
                       <p className="font-semibold text-gray-900">{karyawan.posisi || '-'}</p>
+                    </div>
+                    <div>
+                      <p className="text-sm font-medium text-gray-700">Keterangan</p>
+                      <p className="font-semibold text-gray-900">{karyawan.keterangan || '-'}</p>
                     </div>
                     <div>
                       <p className="text-sm font-medium text-gray-700">Unit</p>
@@ -273,10 +298,14 @@ export default function DetailKaryawan() {
                       <p className="font-semibold text-gray-900">{karyawan.status || '-'}</p>
                     </div>
                     <div>
+                      <p className="text-sm font-medium text-gray-700">Jabatan</p>
+                      <p className="font-semibold text-gray-900">{karyawan.jabatan || '-'}</p>
+                    </div>
+                    <div>
                       <p className="text-sm font-medium text-gray-700">Awal Masuk</p>
                       <p className="font-semibold text-gray-900">{karyawan.awal_masuk ? formatDate(karyawan.awal_masuk) : '-'}</p>
                     </div>
-                    <div>
+                    <div className="md:col-span-2">
                       <p className="text-sm font-medium text-gray-700">Masa Kerja</p>
                       <p className="font-semibold text-gray-900">
                         {karyawan.awal_masuk 

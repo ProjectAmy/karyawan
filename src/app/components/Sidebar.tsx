@@ -18,8 +18,8 @@ export default function Sidebar({ onLogout, open, onClose }: { onLogout: () => v
           </svg>
         </button>
         <nav className="flex flex-col gap-4 mt-2 md:mt-0">
-          <a href="/dashboard" className="hover:bg-blue-700 px-4 py-2 rounded transition-colors">Home</a>
-          <a href="/karyawan-baru" className="hover:bg-blue-700 px-4 py-2 rounded transition-colors">Karyawan Baru</a>
+          <a href="/dashboard" className="hover:bg-green-700 px-4 py-2 rounded transition-colors">Home</a>
+          <a href="/karyawan-baru" className="hover:bg-green-700 px-4 py-2 rounded transition-colors">Karyawan Baru</a>
           <button onClick={onLogout} className="mt-8 bg-red-500 hover:bg-red-700 px-4 py-2 rounded transition-colors">Log Out</button>
         </nav>
       </aside>
