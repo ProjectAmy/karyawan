@@ -130,15 +130,9 @@ export default function KaryawanBaruPage() {
         updated_at: new Date().toISOString(),
       };
       
-      // Destructure to remove file objects before inserting to database
-      // Using _ prefix to indicate intentionally unused variables
-      const { 
-        foto_ktp: _fotoKtp, 
-        foto_kk: _fotoKk, 
-        foto_buku_nikah: _fotoBukuNikah, 
-        foto_akte_anak: _fotoAkteAnak, 
-        ...dbData 
-      } = employeeData;
+      // Create a new object without the file fields for database insertion
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      const { foto_ktp, foto_kk, foto_buku_nikah, foto_akte_anak, ...dbData } = employeeData;
       
       // Insert employee data into the database
       const { error } = await supabase
