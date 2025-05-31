@@ -33,6 +33,7 @@ export default function DashboardPage() {
   const [userName, setUserName] = useState('');
   const [currentDate, setCurrentDate] = useState('');
   const [karyawanData, setKaryawanData] = useState<Karyawan[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
   const router = useRouter();
 
   // Fungsi untuk mendapatkan nama hari dalam bahasa Indonesia
@@ -94,25 +95,27 @@ export default function DashboardPage() {
   // Handle user authentication state
   useEffect(() => {
     const checkAuth = async () => {
+      setIsLoading(true);
       try {
         const { data: { user }, error } = await supabase.auth.getUser();
         
         if (error) {
           console.error('Error getting user:', error);
-          router.push('/login');
+          router.push('/');
           return;
         }
         
         if (!user) {
-          router.push('/login');
+          router.push('/');
           return;
         }
         
         const name = user.user_metadata?.full_name || (user.email ? user.email.split('@')[0] : 'User');
         setUserName(name);
+        setIsLoading(false);
       } catch (error) {
         console.error('Error checking auth:', error);
-        router.push('/login');
+        router.push('/');
       }
     };
 
@@ -200,6 +203,14 @@ export default function DashboardPage() {
     if (months > 0) return `${months} bulan`;
     return `${days} hari`;
   };
+
+  if (isLoading) {
+    return (
+      <div className="flex h-screen w-full items-center justify-center bg-gray-100">
+        <div className="h-16 w-16 animate-spin rounded-full border-4 border-green-600 border-t-transparent"></div>
+      </div>
+    );
+  }
 
   return (
     <div className="flex flex-col min-h-screen">

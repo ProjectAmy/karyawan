@@ -43,7 +43,7 @@ export default function DetailKaryawan() {
   // Handle logout
   const handleLogout = async () => {
     await supabase.auth.signOut();
-    router.push('/login');
+    router.push('/');
   };
 
   // Toggle sidebar
