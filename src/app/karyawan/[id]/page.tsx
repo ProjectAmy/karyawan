@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useState } from 'react';
 import { useRouter, useParams } from 'next/navigation';
+import Image from 'next/image';
 import { supabase } from '@/lib/supabase';
 import Header from '@/app/components/Header';
 import Sidebar from '@/app/components/Sidebar';
@@ -186,10 +187,13 @@ export default function DetailKaryawan() {
                   {karyawan.foto && (
                     <div className="mt-4 md:mt-0">
                       <div className="w-24 h-24 rounded-full bg-white overflow-hidden border-4 border-white">
-                        <img 
-                          src={karyawan.foto} 
+                        <Image 
+                          src={karyawan.foto}
                           alt={karyawan.nama}
+                          width={96}
+                          height={96}
                           className="w-full h-full object-cover"
+                          unoptimized={true} // Only if you're using external images that aren't optimized
                         />
                       </div>
                     </div>

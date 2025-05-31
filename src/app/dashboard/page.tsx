@@ -47,14 +47,14 @@ export default function DashboardPage() {
   };
 
   // Fungsi untuk format tanggal
-  const formatDate = () => {
+  const formatDate = useCallback(() => {
     const now = new Date();
     const day = getDayName(now);
     const date = now.getDate();
     const month = getMonthName(now);
     const year = now.getFullYear();
     return `${day}, ${date} ${month} ${year}`;
-  };
+  }, []); // No dependencies needed as it only uses pure functions
 
   // Fetch data karyawan dari Supabase
   const fetchKaryawanData = useCallback(async () => {
@@ -83,7 +83,7 @@ export default function DashboardPage() {
   // Update tanggal saat komponen dimuat
   useEffect(() => {
     setCurrentDate(formatDate());
-  }, []); // formatDate is defined outside the effect, so no need to include it in deps
+  }, [formatDate]); // Add formatDate to dependencies since it's now memoized with useCallback
 
   // Fetch data when component mounts
   useEffect(() => {
