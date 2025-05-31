@@ -6,55 +6,47 @@ import Footer from "../components/Footer";
 import { supabase } from "@/lib/supabase";
 import { useRouter } from "next/navigation";
 
+interface Karyawan {
+  id: string;
+  nama: string;
+  wa?: string;
+  tanggal_lahir?: string;
+  alamat?: string;
+  email?: string;
+  no_kk?: string;
+  no_ktp?: string;
+  jabatan: string;
+  posisi?: string;
+  divisi: string;
+  status: string;
+  status_kehadiran?: string;
+  awal_masuk?: string;
+  foto?: string | null;
+  unit?: string;
+  keterangan?: string;
+  created_at: string;
+  deleted_at?: string | null;
+}
 
 export default function DashboardPage() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [userName, setUserName] = useState('');
   const [currentDate, setCurrentDate] = useState('');
-  interface Karyawan {
-    id: string;
-    nama: string;
-    wa?: string;
-    tanggal_lahir?: string;
-    alamat?: string;
-    email?: string;
-    no_kk?: string;
-    no_ktp?: string;
-    jabatan: string;
-    posisi?: string;
-    divisi: string;
-    status: string;
-    awal_masuk?: string;
-    foto?: string | null;
-    unit?: string;
-    keterangan?: string;
-    created_at: string;
-  }
-
   const [karyawanData, setKaryawanData] = useState<Karyawan[]>([]);
+  const [searchQuery, setSearchQuery] = useState('');
   const router = useRouter();
 
   // Fungsi untuk mendapatkan nama hari dalam bahasa Indonesia
-  const getDayName = (date: Date) => {
+  const getDayName = (date: Date): string => {
     const days = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
     return days[date.getDay()];
   };
 
   // Fungsi untuk mendapatkan nama bulan dalam bahasa Indonesia
-  const getMonthName = (date: Date) => {
+  const getMonthName = (date: Date): string => {
     const months = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
     return months[date.getMonth()];
   };
-
-  // Fungsi untuk format tanggal
-  const formatDate = useCallback(() => {
-    const now = new Date();
-    const day = getDayName(now);
-    const date = now.getDate();
-    const month = getMonthName(now);
-    const year = now.getFullYear();
-    return `${day}, ${date} ${month} ${year}`;
-  }, []); // No dependencies needed as it only uses pure functions
 
   // Fetch data karyawan dari Supabase
   const fetchKaryawanData = useCallback(async () => {
@@ -62,17 +54,20 @@ export default function DashboardPage() {
       const { data, error } = await supabase
         .from('karyawan')
         .select('*')
+        .or('deleted_at.is.null')
         .order('created_at', { ascending: false });
 
       if (error) {
-        throw error;
+        console.error('Error fetching data:', error);
+        return;
       }
 
-      if (data) {
-        setKaryawanData(data);
-      } else {
+      // Filter out any null or undefined data
+      const validData = data?.filter(Boolean) || [];
+      setKaryawanData(validData);
+      
+      if (validData.length === 0) {
         console.log('No data received');
-        setKaryawanData([]);
       }
     } catch (error) {
       console.error('Error fetching karyawan data:', error);
@@ -82,58 +77,143 @@ export default function DashboardPage() {
 
   // Update tanggal saat komponen dimuat
   useEffect(() => {
-    setCurrentDate(formatDate());
-  }, [formatDate]); // Add formatDate to dependencies since it's now memoized with useCallback
-
-  // Fetch data when component mounts
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        await fetchKaryawanData();
-      } catch (error) {
-        console.error('Error fetching data:', error);
-      }
-    };
-
-    fetchData();
-
-    // Only set up the interval if we have a valid Supabase client
-    if (process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
-      const interval = setInterval(fetchKaryawanData, 30000);
-      return () => clearInterval(interval);
-    }
+    const now = new Date();
+    const day = getDayName(now);
+    const date = now.getDate();
+    const month = getMonthName(now);
+    const year = now.getFullYear();
+    setCurrentDate(`${day}, ${date} ${month} ${year}`);
+    
+    // Fetch data saat komponen dimuat
+    fetchKaryawanData();
+    
+    // Set up interval untuk refresh data setiap 30 detik
+    const interval = setInterval(fetchKaryawanData, 30000);
+    return () => clearInterval(interval);
   }, [fetchKaryawanData]);
 
+  // Handle user authentication state
   useEffect(() => {
-    // Periksa status login dan ambil nama pengguna saat komponen dimuat
     const checkAuth = async () => {
-      const { data: { user }, error } = await supabase.auth.getUser();
-      if (error || !user) {
-        router.push('/'); // Redirect ke halaman login jika tidak login
-        return;
+      try {
+        const { data: { user }, error } = await supabase.auth.getUser();
+        
+        if (error) {
+          console.error('Error getting user:', error);
+          router.push('/login');
+          return;
+        }
+        
+        if (!user) {
+          router.push('/login');
+          return;
+        }
+        
+        setUserName(user.email || '');
+      } catch (error) {
+        console.error('Error checking auth:', error);
+        router.push('/login');
       }
-
-      // Ambil nama pengguna dari metadata atau email jika tidak ada nama
-      const name = user.user_metadata?.full_name || (user.email ? user.email.split('@')[0] : 'User');
-      setUserName(name);
     };
 
     checkAuth();
   }, [router]);
 
-  const handleLogout = async () => {
+
+
+  const handleSearch = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!searchQuery.trim()) {
+      await fetchKaryawanData();
+      return;
+    }
+    
     try {
-      const { error } = await supabase.auth.signOut();
-      if (error) throw error;
-      router.push('/'); // Gunakan router.push untuk konsistensi
-    } catch (err) {
-      console.error('Error during logout:', err);
-      // Tampilkan pesan error jika diperlukan
+      const { data, error } = await supabase
+        .from('karyawan')
+        .select('*')
+        .or(`nama.ilike.%${searchQuery}%,nik.ilike.%${searchQuery}%`)
+        .or('deleted_at.is.null');
+
+      if (error) {
+        console.error('Error searching:', error);
+        return;
+      }
+
+      setKaryawanData(data || []);
+    } catch (error) {
+      console.error('Error searching:', error);
     }
   };
 
-  const handleDelete = async (id: string) => {
-    if (!confirm('Apakah Anda yakin ingin menghapus data karyawan ini?')) return;
+  // Handle user authentication state
+  useEffect(() => {
+    const checkAuth = async () => {
+      try {
+        const { data: { user }, error } = await supabase.auth.getUser();
+        
+        if (error) {
+          console.error('Error getting user:', error);
+          router.push('/login');
+          return;
+        }
+        
+        if (!user) {
+          router.push('/login');
+          return;
+        }
+        
+        const name = user.user_metadata?.full_name || (user.email ? user.email.split('@')[0] : 'User');
+        setUserName(name);
+      } catch (error) {
+        console.error('Error checking auth:', error);
+        router.push('/login');
+      }
+    };
+
+    checkAuth();
+  }, [router]);
+
+  const handleLogout = async (): Promise<void> => {
+    try {
+      const { error } = await supabase.auth.signOut();
+      if (error) throw error;
+      router.push('/');
+    } catch (error) {
+      console.error('Error during logout:', error);
+    }
+  };
+
+  const handleUpdateStatus = async (id: string, status: string): Promise<void> => {
+    try {
+      const { data, error } = await supabase
+        .from('karyawan')
+        .update({ status_kehadiran: status })
+        .eq('id', id)
+        .select();
+
+      if (error) {
+        console.error('Error updating status:', error);
+        return;
+      }
+
+      if (data && data.length > 0) {
+        // Update the local state with the updated data
+        setKaryawanData((prevData: Karyawan[]) => 
+          prevData.map((karyawan: Karyawan) => 
+            karyawan.id === id ? { ...karyawan, status_kehadiran: status } : karyawan
+          )
+        );
+      }
+    } catch (error) {
+      console.error('Error updating status:', error);
+    }
+  };
+
+  const handleDelete = async (id: string): Promise<void> => {
+    if (!window.confirm('Apakah Anda yakin ingin menghapus karyawan ini?')) {
+      return;
+    }
 
     try {
       const { error } = await supabase
@@ -141,19 +221,17 @@ export default function DashboardPage() {
         .update({ deleted_at: new Date().toISOString() })
         .eq('id', id);
 
-      if (error) throw error;
+      if (error) {
+        console.error('Error deleting employee:', error);
+        return;
+      }
       
-      // Refresh data setelah berhasil menghapus
-      const { data, error: fetchError } = await supabase
-        .from('karyawan')
-        .select('*')
-        .eq('deleted_at', null);
-
-      if (fetchError) throw fetchError;
-      setKaryawanData(data || []);
+      // Filter out the deleted employee from the local state
+      setKaryawanData((prevData: Karyawan[]) => 
+        prevData.filter((k: Karyawan) => k.id !== id)
+      );
     } catch (error) {
-      console.error('Error deleting karyawan:', error);
-      alert('Gagal menghapus data karyawan. Silakan coba lagi.');
+      console.error('Error deleting employee:', error);
     }
   };
 
