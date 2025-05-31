@@ -234,8 +234,8 @@ export default function DashboardPage() {
               { title: 'Percobaan', count: karyawanData.filter(k => k.status === 'percobaan').length, icon: '⏳' },
               { title: 'Tidak Tetap', count: karyawanData.filter(k => k.status === 'tidak_tetap').length, icon: '📝' },
               { title: 'Tetap', count: karyawanData.filter(k => k.status === 'tetap').length, icon: '✅' },
-            ].map((item, index) => (
-              <div key={index} className="bg-white rounded-lg p-2 sm:p-3 text-center border-2 border-green-100 hover:border-green-200 hover:shadow-md transition-all duration-200">
+            ].map((item, i) => (
+              <div key={i} className="bg-white rounded-lg p-2 sm:p-3 text-center border-2 border-green-100 hover:border-green-200 hover:shadow-md transition-all duration-200">
                 <div className="text-2xl mb-1">{item.icon}</div>
                 <div className="text-xs sm:text-sm text-gray-600 font-medium">{item.title}</div>
                 <div className="font-extrabold text-base sm:text-lg md:text-xl text-green-700 mt-1">
