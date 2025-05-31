@@ -239,7 +239,27 @@ export default function DashboardPage() {
                         {karyawan.nama}
                       </a>
                     </td>
-                    <td className="border p-2">{karyawan.wa}</td>
+                    <td className="border p-2">
+                      {karyawan.wa && (() => {
+                        // Hapus semua karakter non-angka
+                        const cleanNumber = karyawan.wa.replace(/[^0-9]/g, '');
+                        // Jika dimulai dengan 0, ganti dengan 62
+                        const formattedNumber = cleanNumber.startsWith('0') 
+                          ? '62' + cleanNumber.substring(1) 
+                          : cleanNumber;
+                        
+                        return (
+                          <a 
+                            href={`https://wa.me/${formattedNumber}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-blue-600 hover:text-blue-800 hover:underline"
+                          >
+                            {karyawan.wa}
+                          </a>
+                        );
+                      })()}
+                    </td>
                     <td className="border p-2">{calculateAge(karyawan.tanggal_lahir)}</td>
                     <td className="border p-2">{calculateWorkDuration(karyawan.awal_masuk)}</td>
                     <td className="border p-2 text-center">
