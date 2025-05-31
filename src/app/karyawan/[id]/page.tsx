@@ -53,6 +53,13 @@ export default function DetailKaryawan() {
     }
 
     try {
+      // Check if Supabase is properly initialized
+      if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
+        console.error('Supabase is not properly configured');
+        setLoading(false);
+        return;
+      }
+
       const { data, error } = await supabase
         .from('karyawan')
         .select('*')
@@ -63,8 +70,6 @@ export default function DetailKaryawan() {
       
       if (data) {
         console.log('Data karyawan dari database:', data);
-        console.log('Tanggal masuk:', data.tanggal_masuk);
-        console.log('Tipe tanggal masuk:', typeof data.tanggal_masuk);
         setKaryawan(data);
       } else {
         console.log('Tidak ada data ditemukan untuk ID:', id);
@@ -72,7 +77,8 @@ export default function DetailKaryawan() {
       }
     } catch (error) {
       console.error('Error:', error);
-      router.push('/dashboard');
+      // Don't redirect on error to allow static generation
+      setKaryawan(null);
     } finally {
       setLoading(false);
     }

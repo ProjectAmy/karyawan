@@ -88,14 +88,21 @@ export default function DashboardPage() {
   // Fetch data when component mounts
   useEffect(() => {
     const fetchData = async () => {
-      await fetchKaryawanData();
+      try {
+        await fetchKaryawanData();
+      } catch (error) {
+        console.error('Error fetching data:', error);
+      }
     };
+
     fetchData();
 
-    // Add a useEffect to refresh data every 30 seconds
-    const interval = setInterval(fetchKaryawanData, 30000);
-    return () => clearInterval(interval);
-  }, [fetchKaryawanData, formatDate]);
+    // Only set up the interval if we have a valid Supabase client
+    if (process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
+      const interval = setInterval(fetchKaryawanData, 30000);
+      return () => clearInterval(interval);
+    }
+  }, [fetchKaryawanData]);
 
   useEffect(() => {
     // Periksa status login dan ambil nama pengguna saat komponen dimuat
