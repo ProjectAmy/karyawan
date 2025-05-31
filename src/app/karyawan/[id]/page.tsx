@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
 import Header from '@/app/components/Header';
@@ -45,42 +45,41 @@ export default function DetailKaryawan() {
   const toggleSidebar = () => setSidebarOpen(!sidebarOpen);
   const closeSidebar = () => setSidebarOpen(false);
   
-  // Early return if no ID is provided
-  if (!id) {
-    router.push('/dashboard');
-    return null;
-  }
+  const fetchKaryawan = useCallback(async () => {
+    if (!id) {
+      router.push('/dashboard');
+      return;
+    }
+
+    try {
+      const { data, error } = await supabase
+        .from('karyawan')
+        .select('*')
+        .eq('id', id)
+        .single();
+
+      if (error) throw error;
+      
+      if (data) {
+        console.log('Data karyawan dari database:', data);
+        console.log('Tanggal masuk:', data.tanggal_masuk);
+        console.log('Tipe tanggal masuk:', typeof data.tanggal_masuk);
+        setKaryawan(data);
+      } else {
+        console.log('Tidak ada data ditemukan untuk ID:', id);
+        router.push('/dashboard');
+      }
+    } catch (error) {
+      console.error('Error:', error);
+      router.push('/dashboard');
+    } finally {
+      setLoading(false);
+    }
+  }, [id, router]);
 
   useEffect(() => {
-    const fetchKaryawan = async () => {
-      try {
-        const { data, error } = await supabase
-          .from('karyawan')
-          .select('*')
-          .eq('id', id)
-          .single();
-
-        if (error) throw error;
-        
-        if (data) {
-          console.log('Data karyawan dari database:', data);
-          console.log('Tanggal masuk:', data.tanggal_masuk);
-          console.log('Tipe tanggal masuk:', typeof data.tanggal_masuk);
-          setKaryawan(data);
-        } else {
-          console.log('Tidak ada data ditemukan untuk ID:', id);
-          router.push('/dashboard');
-        }
-      } catch (error) {
-        console.error('Error:', error);
-        router.push('/dashboard');
-      } finally {
-        setLoading(false);
-      }
-    };
-
     fetchKaryawan();
-  }, [id]);
+  }, [fetchKaryawan]);
 
 
 

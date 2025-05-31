@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import Header from "../components/Header";
 import Sidebar from "../components/Sidebar";
 import Footer from "../components/Footer";
@@ -11,7 +11,27 @@ export default function DashboardPage() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [userName, setUserName] = useState('');
   const [currentDate, setCurrentDate] = useState('');
-  const [karyawanData, setKaryawanData] = useState<any[]>([]);
+  interface Karyawan {
+    id: string;
+    nama: string;
+    wa?: string;
+    tanggal_lahir?: string;
+    alamat?: string;
+    email?: string;
+    no_kk?: string;
+    no_ktp?: string;
+    jabatan: string;
+    posisi?: string;
+    divisi: string;
+    status: string;
+    awal_masuk?: string;
+    foto?: string | null;
+    unit?: string;
+    keterangan?: string;
+    created_at: string;
+  }
+
+  const [karyawanData, setKaryawanData] = useState<Karyawan[]>([]);
   const router = useRouter();
 
   // Fungsi untuk mendapatkan nama hari dalam bahasa Indonesia
@@ -37,7 +57,7 @@ export default function DashboardPage() {
   };
 
   // Fetch data karyawan dari Supabase
-  const fetchKaryawanData = async () => {
+  const fetchKaryawanData = useCallback(async () => {
     try {
       const { data, error } = await supabase
         .from('karyawan')
@@ -58,21 +78,24 @@ export default function DashboardPage() {
       console.error('Error fetching karyawan data:', error);
       setKaryawanData([]);
     }
-  };
+  }, []);
 
   // Update tanggal saat komponen dimuat
   useEffect(() => {
     setCurrentDate(formatDate());
-  }, []);
+  }, []); // formatDate is defined outside the effect, so no need to include it in deps
 
   // Fetch data when component mounts
   useEffect(() => {
-    fetchKaryawanData();
+    const fetchData = async () => {
+      await fetchKaryawanData();
+    };
+    fetchData();
 
     // Add a useEffect to refresh data every 30 seconds
     const interval = setInterval(fetchKaryawanData, 30000);
     return () => clearInterval(interval);
-  }, []);
+  }, [fetchKaryawanData, formatDate]);
 
   useEffect(() => {
     // Periksa status login dan ambil nama pengguna saat komponen dimuat
@@ -260,8 +283,8 @@ export default function DashboardPage() {
                         );
                       })()}
                     </td>
-                    <td className="border p-2">{calculateAge(karyawan.tanggal_lahir)}</td>
-                    <td className="border p-2">{calculateWorkDuration(karyawan.awal_masuk)}</td>
+                    <td className="border p-2">{karyawan.tanggal_lahir ? calculateAge(karyawan.tanggal_lahir) : '-'}</td>
+                    <td className="border p-2">{karyawan.awal_masuk ? calculateWorkDuration(karyawan.awal_masuk) : '-'}</td>
                     <td className="border p-2 text-center">
                       <a 
                         href={`/karyawan/${karyawan.id}/edit`} 
