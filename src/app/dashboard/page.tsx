@@ -34,6 +34,9 @@ export default function DashboardPage() {
   const [currentDate, setCurrentDate] = useState('');
   const [karyawanData, setKaryawanData] = useState<Karyawan[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const [selectedKaryawan, setSelectedKaryawan] = useState<{id: string, name: string} | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
   const router = useRouter();
 
   // Fungsi untuk mendapatkan nama hari dalam bahasa Indonesia
@@ -140,7 +143,8 @@ export default function DashboardPage() {
       const { error } = await supabase
         .from('karyawan')
         .update({ status_kehadiran: status })
-        .eq('id', id);
+        .eq('id', id)
+        .is('deleted_at', null);
 
       if (error) {
         console.error('Error updating status:', error);
@@ -156,27 +160,44 @@ export default function DashboardPage() {
   }, []);
   */
 
-  const handleDelete = useCallback(async (id: string): Promise<void> => {
-    if (!window.confirm('Apakah Anda yakin ingin menghapus karyawan ini?')) {
-      return;
-    }
+  const handleDeleteClick = (id: string, name: string) => {
+    setSelectedKaryawan({ id, name });
+    setShowDeleteDialog(true);
+  };
 
+  const handleDelete = useCallback(async (e?: React.MouseEvent): Promise<void> => {
+    e?.preventDefault();
+    if (!selectedKaryawan) return;
+    
+    setIsDeleting(true);
     try {
       const { error } = await supabase
         .from('karyawan')
-        .update({ deleted_at: new Date().toISOString() })
-        .eq('id', id);
+        .update({ 
+          deleted_at: new Date().toISOString(),
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', selectedKaryawan.id);
 
       if (error) {
         console.error('Error deleting employee:', error);
         return;
       }
       
-      setKaryawanData(prevData => prevData.filter(k => k.id !== id));
+      setKaryawanData(prevData => prevData.filter(k => k.id !== selectedKaryawan.id));
+      setShowDeleteDialog(false);
+      setSelectedKaryawan(null);
     } catch (error) {
       console.error('Error deleting employee:', error);
+    } finally {
+      setIsDeleting(false);
     }
-  }, []);
+  }, [selectedKaryawan]);
+  
+  const closeDeleteDialog = () => {
+    setShowDeleteDialog(false);
+    setSelectedKaryawan(null);
+  };
 
   // Helper function to calculate age
   const calculateAge = (birthDate: string): number => {
@@ -213,7 +234,48 @@ export default function DashboardPage() {
   }
 
   return (
-    <div className="flex flex-col min-h-screen">
+    <div className="flex flex-col min-h-screen relative">
+      {/* Delete Confirmation Dialog */}
+      {showDeleteDialog && selectedKaryawan && (
+        <div 
+          className="fixed inset-0 bg-black/50 flex items-center justify-center z-50"
+          onClick={closeDeleteDialog}
+        >
+          <div 
+            className="bg-white rounded-lg p-6 max-w-md w-full mx-4"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <h3 className="text-lg font-semibold text-gray-900 mb-4">Konfirmasi Hapus</h3>
+            <p className="text-gray-700 mb-6">
+              Apakah Anda yakin ingin menghapus data <span className="font-semibold">{selectedKaryawan.name}</span>? 
+            </p>
+            <div className="flex justify-end space-x-3">
+              <button
+                onClick={closeDeleteDialog}
+                disabled={isDeleting}
+                className="px-4 py-2 text-white bg-green-600 rounded-md hover:bg-green-700 transition-colors"
+              >
+                Batal
+              </button>
+              <button
+                onClick={handleDelete}
+                disabled={isDeleting}
+                className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 disabled:opacity-50 flex items-center"
+              >
+                {isDeleting ? (
+                  <>
+                    <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    Menghapus...
+                  </>
+                ) : 'Hapus'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
       <Header onMenuClick={() => setSidebarOpen(true)} />
       <div className="flex flex-1 relative">
         <Sidebar
@@ -290,10 +352,11 @@ export default function DashboardPage() {
                             Edit
                           </a>
                           <button 
-                            onClick={() => handleDelete(karyawan.id)}
-                            className="flex-1 bg-red-500 hover:bg-red-600 px-2 py-1 rounded text-white text-sm"
+                            onClick={() => handleDeleteClick(karyawan.id, karyawan.nama)}
+                            className="flex-1 bg-red-500 hover:bg-red-600 px-2 py-1 rounded text-white text-sm disabled:opacity-50"
+                            disabled={isDeleting}
                           >
-                            Hapus
+                            {isDeleting && selectedKaryawan?.id === karyawan.id ? 'Menghapus...' : 'Hapus'}
                           </button>
                         </div>
                       </div>
@@ -352,10 +415,11 @@ export default function DashboardPage() {
                               Edit
                             </a>
                             <button 
-                              onClick={() => handleDelete(karyawan.id)}
+                              onClick={() => handleDeleteClick(karyawan.id, karyawan.nama)}
                               className="bg-red-500 hover:bg-red-600 px-3 py-1 rounded text-white text-sm transition-colors"
+                              disabled={isDeleting}
                             >
-                              Hapus
+                              {isDeleting && selectedKaryawan?.id === karyawan.id ? 'Menghapus...' : 'Hapus'}
                             </button>
                           </div>
                         </td>

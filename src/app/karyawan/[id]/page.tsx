@@ -36,6 +36,8 @@ export default function DetailKaryawan() {
   const id = Array.isArray(params.id) ? params.id[0] : params.id;
   const [karyawan, setKaryawan] = useState<Karyawan | null>(null);
   const [loading, setLoading] = useState(true);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const router = useRouter();
   
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -56,6 +58,42 @@ export default function DetailKaryawan() {
   const handleLogout = async () => {
     await supabase.auth.signOut();
     router.push('/');
+  };
+
+  // Handle soft delete karyawan
+  const handleDeleteKaryawan = async (e?: React.MouseEvent) => {
+    e?.preventDefault();
+    if (!id) return;
+    
+    setIsDeleting(true);
+    try {
+      const { error } = await supabase
+        .from('karyawan')
+        .update({ 
+          deleted_at: new Date().toISOString(),
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', id);
+      
+      if (error) throw error;
+      
+      router.push('/dashboard');
+    } catch (error) {
+      console.error('Error soft deleting employee:', error);
+      alert('Gagal menghapus data karyawan');
+    } finally {
+      setIsDeleting(false);
+      setShowDeleteDialog(false);
+    }
+  };
+  
+  const openDeleteDialog = (e: React.MouseEvent) => {
+    e.preventDefault();
+    setShowDeleteDialog(true);
+  };
+  
+  const closeDeleteDialog = () => {
+    setShowDeleteDialog(false);
   };
 
   // Toggle sidebar
@@ -80,6 +118,7 @@ export default function DetailKaryawan() {
         .from('karyawan')
         .select('*')
         .eq('id', id)
+        .is('deleted_at', null)
         .single();
 
       if (error) throw error;
@@ -222,7 +261,29 @@ export default function DetailKaryawan() {
               <div className="bg-green-700 p-6 text-white">
                 <div className="flex flex-col md:flex-row md:items-center md:justify-between">
                   <div className="space-y-2 md:space-y-3">
-                    <h1 className="text-2xl md:text-3xl font-bold">{karyawan.nama}</h1>
+                    <div className="flex items-center gap-4">
+                      <h1 className="text-2xl md:text-3xl font-bold">{karyawan.nama}</h1>
+                      <div className="flex gap-2">
+                        <button 
+                          onClick={() => router.push(`/edit-karyawan/${id}`)}
+                          className="p-2 text-blue-600 bg-blue-50 rounded-md hover:bg-blue-100"
+                          title="Edit Karyawan"
+                        >
+                          <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                          </svg>
+                        </button>
+                        <button 
+                          onClick={openDeleteDialog}
+                          className="p-2 text-red-600 bg-red-50 rounded-md hover:bg-red-100"
+                          title="Hapus Karyawan"
+                        >
+                          <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                          </svg>
+                        </button>
+                      </div>
+                    </div>
                     {karyawan.keterangan && (
                       <p className="text-green-100 font-medium text-base md:text-lg">
                         {karyawan.keterangan.charAt(0).toUpperCase() + karyawan.keterangan.slice(1)}
@@ -443,6 +504,48 @@ export default function DetailKaryawan() {
         
         <Footer />
       </div>
+      
+      {/* Delete Confirmation Dialog */}
+      {showDeleteDialog && (
+        <div 
+          className="fixed inset-0 bg-black/20 flex items-center justify-center z-50"
+          onClick={closeDeleteDialog}
+        >
+          <div 
+            className="bg-white rounded-lg p-6 max-w-md w-full mx-4"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <h3 className="text-lg font-semibold text-gray-900 mb-4">Konfirmasi Hapus</h3>
+            <p className="text-gray-700 mb-6">
+              Apakah Anda yakin ingin menghapus data <span className="font-semibold">{karyawan.nama}</span>?
+            </p>
+            <div className="flex justify-end space-x-3">
+              <button
+                onClick={closeDeleteDialog}
+                className="px-4 py-2 text-white bg-green-600 rounded-md hover:bg-green-700 transition-colors"
+                disabled={isDeleting}
+              >
+                Batal
+              </button>
+              <button
+                onClick={handleDeleteKaryawan}
+                className="px-4 py-2 text-white bg-red-600 rounded-md hover:bg-red-700 flex items-center"
+                disabled={isDeleting}
+              >
+                {isDeleting ? (
+                  <>
+                    <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    Menghapus...
+                  </>
+                ) : 'Hapus'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
