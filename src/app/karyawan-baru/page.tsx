@@ -16,9 +16,9 @@ interface FormData {
   email: string;
   no_kk?: string;
   no_ktp: string;
-  jabatan: 'kepala sekolah' | 'waka kurikulum' | 'waka kesiswaan' | 'wali kelas';
+  jabatan: 'kepala sekolah' | 'waka kurikulum' | 'waka kesiswaan' | 'wali kelas' | 'tidak menjabat';
   posisi: 'guru' | 'tendik';
-  keterangan: 'guru kelas' | 'guru mapel' | 'bendahara' | 'TU' | 'OB' | 'Yayasan' | 'kasir';
+  keterangan: 'guru kelas' | 'guru mapel' | 'guru tahfidz' | 'bendahara' | 'TU' | 'OB' | 'Yayasan' | 'kasir';
   status: 'tetap' | 'tidak tetap' | 'percobaan' | 'honorer';
   awal_masuk: string;
   unit: 'TK' | 'SD' | 'SMP';
@@ -290,12 +290,13 @@ export default function KaryawanBaruPage() {
                 <select
                   name="keterangan"
                   value={form.keterangan}
-                  onChange={(e) => setForm({...form, keterangan: e.target.value as 'guru kelas' | 'guru mapel' | 'bendahara' | 'TU' | 'OB' | 'Yayasan' | 'kasir'})}
+                  onChange={(e) => setForm({...form, keterangan: e.target.value as 'guru kelas' | 'guru mapel' | 'guru tahfidz' | 'bendahara' | 'TU' | 'OB' | 'Yayasan' | 'kasir'})}
                   className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent text-gray-800 bg-white"
                   required
                 >
                   <option value="guru kelas">Guru Kelas</option>
                   <option value="guru mapel">Guru Mapel</option>
+                  <option value="guru tahfidz">Guru Tahfidz</option>
                   <option value="bendahara">Bendahara</option>
                   <option value="TU">Tata Usaha</option>
                   <option value="OB">OB</option>
@@ -324,7 +325,7 @@ export default function KaryawanBaruPage() {
                 <select
                   name="jabatan"
                   value={form.jabatan}
-                  onChange={(e) => setForm({...form, jabatan: e.target.value as 'kepala sekolah' | 'waka kurikulum' | 'waka kesiswaan' | 'wali kelas'})}
+                  onChange={(e) => setForm({...form, jabatan: e.target.value as 'kepala sekolah' | 'waka kurikulum' | 'waka kesiswaan' | 'wali kelas' | 'tidak menjabat'})}
                   className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent text-gray-800 bg-white"
                   required
                 >
@@ -332,6 +333,7 @@ export default function KaryawanBaruPage() {
                   <option value="waka kurikulum">Waka Kurikulum</option>
                   <option value="waka kesiswaan">Waka Kesiswaan</option>
                   <option value="wali kelas">Wali Kelas</option>
+                  <option value="tidak menjabat">Tidak Menjabat</option>
                 </select>
               </div>
               
