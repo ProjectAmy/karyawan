@@ -234,84 +234,83 @@ export default function DashboardPage() {
   }
 
   return (
-    <div className="flex flex-col min-h-screen relative">
-      {/* Delete Confirmation Dialog */}
-      {showDeleteDialog && selectedKaryawan && (
-        <div 
-          className="fixed inset-0 bg-black/50 flex items-center justify-center z-50"
-          onClick={closeDeleteDialog}
-        >
-          <div 
-            className="bg-white rounded-lg p-6 max-w-md w-full mx-4"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">Konfirmasi Hapus</h3>
-            <p className="text-gray-700 mb-6">
-              Apakah Anda yakin ingin menghapus data <span className="font-semibold">{selectedKaryawan.name}</span>? 
-            </p>
-            <div className="flex justify-end space-x-3">
-              <button
-                onClick={closeDeleteDialog}
-                disabled={isDeleting}
-                className="px-4 py-2 text-white bg-green-600 rounded-md hover:bg-green-700 transition-colors"
+    <div className="flex h-screen overflow-hidden">
+      <Sidebar 
+        open={sidebarOpen} 
+        onClose={() => setSidebarOpen(false)}
+        onLogout={handleLogout}
+      />
+      
+      <div className="relative flex flex-col flex-1 overflow-y-auto overflow-x-hidden">
+        <Header onMenuClick={() => setSidebarOpen(!sidebarOpen)} />
+        
+        <main className="grow bg-white">
+          {/* Delete Confirmation Dialog */}
+          {showDeleteDialog && selectedKaryawan && (
+            <div 
+              className="fixed inset-0 bg-black/20 flex items-center justify-center z-50"
+              onClick={closeDeleteDialog}
+            >
+              <div 
+                className="bg-white rounded-lg p-6 max-w-md w-full mx-4"
+                onClick={(e) => e.stopPropagation()}
               >
-                Batal
-              </button>
-              <button
-                onClick={handleDelete}
-                disabled={isDeleting}
-                className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 disabled:opacity-50 flex items-center"
-              >
-                {isDeleting ? (
-                  <>
-                    <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                    </svg>
-                    Menghapus...
-                  </>
-                ) : 'Hapus'}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-      <Header onMenuClick={() => setSidebarOpen(true)} />
-      <div className="flex flex-1 relative">
-        <Sidebar
-          onLogout={handleLogout}
-          open={sidebarOpen}
-          onClose={() => setSidebarOpen(false)}
-        />
-        <main className="flex-1 p-4 md:p-8 bg-gray-50">
-          <h2 className="text-xl md:text-2xl font-bold mb-2 md:mb-3 text-gray-800">Ahlan Wa Sahlan, {userName}!</h2>
-          <p className="text-sm text-gray-600 mb-4 md:mb-6">{currentDate}</p>
-          {karyawanData.length === 0 ? (
-            <div className="text-center text-green-500 space-y-2">
-              <p>Tidak ada data karyawan yang ditampilkan.</p>
-            </div>
-          ) : null}
-          {/* Kartu Statistik */}
-          <div className="grid grid-cols-2 md:grid-cols-3 gap-2 sm:gap-3 mb-4">
-            {[
-              { title: 'Guru', count: karyawanData.filter(k => k.posisi === 'guru').length, icon: '👨‍🏫' },
-              { title: 'Tendik', count: karyawanData.filter(k => k.posisi === 'tendik').length, icon: '👨‍💼' },
-              { title: 'Total Karyawan', count: karyawanData.length, icon: '👥' },
-              { title: 'Percobaan', count: karyawanData.filter(k => k.status === 'percobaan').length, icon: '⏳' },
-              { title: 'Tidak Tetap', count: karyawanData.filter(k => k.status === 'tidak_tetap').length, icon: '📝' },
-              { title: 'Tetap', count: karyawanData.filter(k => k.status === 'tetap').length, icon: '✅' },
-            ].map((item, i) => (
-              <div key={i} className="bg-white rounded-lg p-2 sm:p-3 text-center border-2 border-green-100 hover:border-green-200 hover:shadow-md transition-all duration-200">
-                <div className="text-2xl mb-1">{item.icon}</div>
-                <div className="text-xs sm:text-sm text-gray-600 font-medium">{item.title}</div>
-                <div className="font-extrabold text-base sm:text-lg md:text-xl text-green-700 mt-1">
-                  {item.count}
+                <h3 className="text-lg font-semibold text-gray-900 mb-4">Konfirmasi Hapus</h3>
+                <p className="mb-6 text-gray-800">
+                  Apakah Anda yakin ingin menghapus <span className="font-semibold text-gray-900">{selectedKaryawan.name}</span>? 
+                </p>
+                <div className="flex justify-end space-x-3">
+                  <button
+                    onClick={closeDeleteDialog}
+                    disabled={isDeleting}
+                    className="px-4 py-2 text-white bg-green-600 rounded-md hover:bg-green-700 transition-colors"
+                  >
+                    Batal
+                  </button>
+                  <button
+                    onClick={handleDelete}
+                    disabled={isDeleting}
+                    className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 disabled:opacity-50 flex items-center"
+                  >
+                    {isDeleting ? (
+                      <>
+                        <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
+                        Menghapus...
+                      </>
+                    ) : 'Hapus'}
+                  </button>
                 </div>
               </div>
-            ))}
-          </div>
-          {/* Tabel Responsif */}
-          <div className="bg-white rounded-lg shadow-md overflow-hidden">
+            </div>
+          )}
+          
+          <div className="px-4 sm:px-6 lg:px-8 py-8 w-full max-w-7xl mx-auto">
+            <h2 className="text-2xl font-bold text-gray-900 mb-6">Dashboard HRD</h2>
+            <p className="text-gray-600 mb-8">Selamat datang, <span className="font-medium">{userName}</span>. Berikut adalah ringkasan data karyawan.</p>
+            <div className="grid grid-cols-2 md:grid-cols-3 gap-2 sm:gap-3 mb-4">
+              {[
+                { title: 'Guru', count: karyawanData.filter(k => k.posisi === 'guru').length, icon: '👨‍🏫' },
+                { title: 'Tendik', count: karyawanData.filter(k => k.posisi === 'tendik').length, icon: '👨‍💼' },
+                { title: 'Total Karyawan', count: karyawanData.length, icon: '👥' },
+                { title: 'Percobaan', count: karyawanData.filter(k => k.status === 'percobaan').length, icon: '⏳' },
+                { title: 'Tidak Tetap', count: karyawanData.filter(k => k.status === 'tidak_tetap').length, icon: '📝' },
+                { title: 'Tetap', count: karyawanData.filter(k => k.status === 'tetap').length, icon: '✅' }
+              ].map((item, i) => (
+                <div key={i} className="bg-white rounded-lg p-2 sm:p-3 text-center border-2 border-green-100 hover:border-green-200 hover:shadow-md transition-all duration-200">
+                  <div className="text-2xl mb-1">{item.icon}</div>
+                  <div className="text-xs sm:text-sm text-gray-600 font-medium">{item.title}</div>
+                  <div className="font-extrabold text-base sm:text-lg md:text-xl text-green-700 mt-1">
+                    {item.count}
+                  </div>
+                </div>
+              ))}
+            </div>
+            
+            {/* Tabel Responsif */}
+            <div className="bg-white rounded-lg shadow-md overflow-hidden mt-6">
             <div className="overflow-x-auto">
               <div className="min-w-full md:w-full">
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 p-4 sm:hidden">
@@ -346,7 +345,7 @@ export default function DashboardPage() {
                         </div>
                         <div className="flex space-x-2 mt-2">
                           <a 
-                            href={`/karyawan/${karyawan.id}/edit`} 
+                            href={`/edit/${karyawan.id}`} 
                             className="flex-1 bg-blue-600 hover:bg-blue-700 px-2 py-1 rounded text-white text-center text-sm"
                           >
                             Edit
@@ -409,7 +408,7 @@ export default function DashboardPage() {
                         <td className="p-3 text-sm text-center">
                           <div className="flex justify-center space-x-2">
                             <a 
-                              href={`/karyawan/${karyawan.id}/edit`} 
+                              href={`/edit/${karyawan.id}`} 
                               className="bg-blue-600 hover:bg-blue-700 px-3 py-1 rounded text-white text-sm transition-colors"
                             >
                               Edit
@@ -429,10 +428,11 @@ export default function DashboardPage() {
                 </table>
               </div>
             </div>
+            </div>
           </div>
+          <Footer />
         </main>
       </div>
-      <Footer />
     </div>
   );
 }

@@ -265,7 +265,7 @@ export default function DetailKaryawan() {
                       <h1 className="text-2xl md:text-3xl font-bold">{karyawan.nama}</h1>
                       <div className="flex gap-2">
                         <button 
-                          onClick={() => router.push(`/edit-karyawan/${id}`)}
+                          onClick={() => router.push(`/edit/${id}`)}
                           className="p-2 text-blue-600 bg-blue-50 rounded-md hover:bg-blue-100"
                           title="Edit Karyawan"
                         >
@@ -517,7 +517,7 @@ export default function DetailKaryawan() {
           >
             <h3 className="text-lg font-semibold text-gray-900 mb-4">Konfirmasi Hapus</h3>
             <p className="text-gray-700 mb-6">
-              Apakah Anda yakin ingin menghapus data <span className="font-semibold">{karyawan.nama}</span>?
+              Apakah Anda yakin ingin menghapus data karyawan ini?
             </p>
             <div className="flex justify-end space-x-3">
               <button
