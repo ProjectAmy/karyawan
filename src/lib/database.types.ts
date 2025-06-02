@@ -85,13 +85,13 @@ export interface Database {
       }
     }
     Views: {
-      // Add view types here if you have any
+      [key: string]: unknown
     }
     Functions: {
-      // Add function types here if you have any
+      [key: string]: unknown
     }
     Enums: {
-      // Add enum types here if you have any
+      [key: string]: unknown
     }
   }
 }

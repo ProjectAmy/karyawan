@@ -1,5 +1,6 @@
 "use client";
 import React from "react";
+import Image from "next/image";
 
 export default function Header({ onMenuClick }: { onMenuClick: () => void }) {
   return (
@@ -19,10 +20,13 @@ export default function Header({ onMenuClick }: { onMenuClick: () => void }) {
         {/* Logo dan Judul */}
         <div className="flex-1 flex items-center justify-center md:justify-start md:pl-12">
           <div className="flex items-center space-x-3">
-            <img 
+            <Image 
               src="/images/logoalirsyad.png" 
               alt="Logo Al Irsyad" 
-              className="h-10 w-10 object-contain"
+              width={40}
+              height={40}
+              className="object-contain"
+              priority
             />
             <h1 className="font-bold text-xl">Dashboard HRD</h1>
           </div>

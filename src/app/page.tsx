@@ -1,6 +1,7 @@
 "use client"
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 import { supabase } from "@/lib/supabase";
 
 export default function Home() {
@@ -34,11 +35,14 @@ export default function Home() {
       >
         {/* Logo Al Irsyad */}
         <div className="flex justify-center mb-4">
-          <div className="w-60 h-60 rounded-full overflow-hidden">
-            <img 
+          <div className="relative w-60 h-60 rounded-full overflow-hidden">
+            <Image 
               src="/images/logoalirsyad.png" 
-              alt="Logo Al Irsyad" 
-              className="w-full h-full object-cover"
+              alt="Logo Al Irsyad"
+              fill
+              sizes="(max-width: 768px) 100vw, 50vw"
+              className="object-cover"
+              priority
             />
           </div>
         </div>
