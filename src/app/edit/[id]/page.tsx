@@ -36,13 +36,7 @@ export default function EditEmployee() {
   const id = Array.isArray(params.id) ? params.id[0] : params.id;
   const [employee, setEmployee] = useState<Karyawan | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  
-  // Handle logout
-  const handleLogout = async () => {
-    await supabase.auth.signOut();
-    router.push('/');
-  };
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -80,7 +74,7 @@ export default function EditEmployee() {
         .eq('id', id);
 
       if (error) {
-        setError('Gagal memperbarui data karyawan');
+        setErrorMessage('Gagal memperbarui data karyawan');
         return;
       }
       
@@ -88,8 +82,9 @@ export default function EditEmployee() {
       alert('Data karyawan berhasil diperbarui');
       router.push(`/karyawan/${id}`);
       
-    } catch (error) {
-      setError('Terjadi kesalahan saat memperbarui data');
+    } catch (err) {
+      console.error('Error updating employee:', err);
+      setErrorMessage('Gagal memperbarui data karyawan');
     } finally {
       setIsLoading(false);
     }
@@ -106,7 +101,7 @@ export default function EditEmployee() {
       // Check if Supabase is properly initialized
       if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
         console.error('Supabase is not properly configured');
-        setError('Konfigurasi sistem tidak valid');
+        setErrorMessage('Konfigurasi sistem tidak valid');
         setIsLoading(false);
         return;
       }
@@ -114,7 +109,7 @@ export default function EditEmployee() {
       // Check if user is authenticated
       const { data: { session } } = await supabase.auth.getSession();
       if (!session) {
-        setError('Anda harus login untuk mengakses halaman ini');
+        setErrorMessage('Anda harus login untuk mengakses halaman ini');
         setIsLoading(false);
         return;
       }
@@ -129,12 +124,14 @@ export default function EditEmployee() {
 
       if (fetchError) {
         console.error('Error fetching employee:', fetchError);
-        throw new Error(fetchError.message);
+        setErrorMessage(fetchError.message);
+        setIsLoading(false);
+        return;
       }
       
       if (!data) {
         console.log('No employee found with ID:', id);
-        setError('Data karyawan tidak ditemukan');
+        setErrorMessage('Data karyawan tidak ditemukan');
         setIsLoading(false);
         return;
       }
@@ -144,7 +141,7 @@ export default function EditEmployee() {
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Terjadi kesalahan saat memuat data';
       console.error('Error in fetchEmployee:', { error: err, message: errorMessage });
-      setError(errorMessage);
+      setErrorMessage(errorMessage);
     } finally {
       setIsLoading(false);
     }
@@ -165,12 +162,12 @@ export default function EditEmployee() {
     );
   }
   
-  if (error) {
+  if (errorMessage) {
     return (
       <div className="min-h-screen flex items-center justify-center p-4">
         <div className="bg-red-50 p-6 rounded-lg max-w-2xl w-full">
           <h2 className="text-xl font-bold text-red-700 mb-2">Error</h2>
-          <p className="text-red-600">{error}</p>
+          <p className="text-red-600">{errorMessage}</p>
           <div className="mt-4 space-x-2">
             <button
               onClick={() => window.location.reload()}
@@ -230,9 +227,9 @@ export default function EditEmployee() {
                   <div className="flex justify-center items-center py-12">
                     <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
                   </div>
-                ) : error ? (
+                ) : errorMessage ? (
                   <div className="p-4 mb-6 bg-red-50 border-l-4 border-red-500 text-red-700 rounded">
-                    <p>{error}</p>
+                    <p>{errorMessage}</p>
                   </div>
                 ) : employee ? (
                   <form onSubmit={handleSubmit} className="space-y-6">
@@ -452,12 +449,11 @@ export default function EditEmployee() {
                   </div>
                 )}
                 
-                {error && (
+                {errorMessage && (
                   <div className="mt-8 p-4 bg-red-50 rounded-lg">
                     <h3 className="font-medium text-red-800 mb-2">Detail Error</h3>
-                    <p className="text-sm text-red-700">
-                      {error}
-                    </p>
+                    <p className="font-medium">Error:</p>
+                    <p>{errorMessage}</p>
                     {id && (
                       <p className="text-sm text-red-700 mt-2">
                         ID Karyawan: {id}

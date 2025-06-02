@@ -38,17 +38,7 @@ export default function DashboardPage() {
   const [isDeleting, setIsDeleting] = useState(false);
   const router = useRouter();
 
-  // Fungsi untuk mendapatkan nama hari dalam bahasa Indonesia
-  const getDayName = (date: Date): string => {
-    const days = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
-    return days[date.getDay()];
-  };
 
-  // Fungsi untuk mendapatkan nama bulan dalam bahasa Indonesia
-  const getMonthName = (date: Date): string => {
-    const months = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
-    return months[date.getMonth()];
-  };
 
   // Fetch data karyawan dari Supabase
   const fetchKaryawanData = useCallback(async () => {
@@ -157,7 +147,7 @@ export default function DashboardPage() {
     setShowDeleteDialog(true);
   };
 
-  const handleDelete = useCallback(async (e?: React.MouseEvent): Promise<void> => {
+  const handleDelete = useCallback(async (e?: React.MouseEvent) => {
     e?.preventDefault();
     if (!selectedKaryawan) return;
     
@@ -172,7 +162,7 @@ export default function DashboardPage() {
         .eq('id', selectedKaryawan.id);
 
       if (error) {
-        console.error('Error deleting employee:', error);
+        console.error('Error:', error);
         return;
       }
       
@@ -180,7 +170,7 @@ export default function DashboardPage() {
       setShowDeleteDialog(false);
       setSelectedKaryawan(null);
     } catch (error) {
-      console.error('Error deleting employee:', error);
+      console.error('Error:', error);
     } finally {
       setIsDeleting(false);
     }
