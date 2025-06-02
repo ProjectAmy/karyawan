@@ -31,7 +31,6 @@ interface Karyawan {
 export default function DashboardPage() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [userName, setUserName] = useState('');
-  const [currentDate, setCurrentDate] = useState('');
   const [karyawanData, setKaryawanData] = useState<Karyawan[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
@@ -80,13 +79,6 @@ export default function DashboardPage() {
 
   // Update tanggal saat komponen dimuat
   useEffect(() => {
-    const now = new Date();
-    const day = getDayName(now);
-    const date = now.getDate();
-    const month = getMonthName(now);
-    const year = now.getFullYear();
-    setCurrentDate(`${day}, ${date} ${month} ${year}`);
-    
     // Fetch data saat komponen dimuat
     fetchKaryawanData();
     

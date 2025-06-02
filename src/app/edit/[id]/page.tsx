@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
 import Header from '@/app/components/Header';
-import Sidebar from '@/app/components/Sidebar';
+
 import Footer from '@/app/components/Footer';
 
 interface Karyawan {
@@ -37,11 +37,6 @@ export default function EditEmployee() {
   const [employee, setEmployee] = useState<Karyawan | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [userName, setUserName] = useState('');
-  
-  // Toggle sidebar and handle auth
-  const closeSidebar = () => setSidebarOpen(false);
   
   // Handle logout
   const handleLogout = async () => {
@@ -195,21 +190,11 @@ export default function EditEmployee() {
     );
   }
 
-  // Toggle sidebar function
-  const toggleSidebar = () => setSidebarOpen(!sidebarOpen);
-
   return (
     <div className="flex h-screen overflow-hidden">
-      {/* Sidebar */}
-      <Sidebar 
-        open={sidebarOpen} 
-        onClose={() => setSidebarOpen(false)}
-        onLogout={handleLogout}
-      />
-      
       <div className="relative flex flex-col flex-1 overflow-y-auto overflow-x-hidden">
-        {/* Header */}
-        <Header onMenuClick={toggleSidebar} />
+        {/* Header - Sidebar is handled in the layout component */}
+        <Header onMenuClick={() => {}} />
         
         {/* Main Content */}
         <main className="grow bg-white">
