@@ -162,15 +162,16 @@ export default function KaryawanBaruPage() {
   };
 
   return (
-    <div className="flex flex-col min-h-screen">
-      <Header onMenuClick={() => setSidebarOpen(true)} />
-      <div className="flex flex-1 relative bg-gray-100">
-        <Sidebar
+    <div className="flex h-screen overflow-hidden">
+    <Sidebar
           onLogout={handleLogout}
           open={sidebarOpen}
           onClose={() => setSidebarOpen(false)}
         />
-        <main className="flex-1 flex flex-col items-center justify-center py-6">
+    <div className="relative flex flex-col flex-1 overflow-y-auto overflow-x-hidden">
+      <Header onMenuClick={() => setSidebarOpen(true)} />
+      <main className="grow bg-white py-8">
+        <div className="px-4 sm:px-6 lg:px-8 w-full max-w-4xl mx-auto space-y-6">
           {error && (
             <div className="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 mb-4">
               <p>{error}</p>
@@ -184,13 +185,16 @@ export default function KaryawanBaruPage() {
           )}
           
           {/* Header Profil */}
-          <div className="w-full max-w-4xl mx-auto">
-            <div className="bg-green-700 p-6 text-white rounded-t-lg">
+          {/* Card Wrapper */}
+          <div className="bg-white rounded-lg shadow overflow-hidden">
+            {/* Header Profil */}
+            <div className="bg-green-700 p-6 text-white">
               <div className="space-y-2 md:space-y-3">
                 <h1 className="text-2xl md:text-3xl font-bold">Tambah Data Karyawan</h1>
               </div>
             </div>
-            <form onSubmit={handleSubmit} className="space-y-4 p-6 bg-white rounded-b-lg shadow">
+            {/* Form Content */}
+            <form onSubmit={handleSubmit} className="space-y-4 p-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-medium mb-1 text-gray-800">Nama Lengkap *</label>
@@ -440,10 +444,11 @@ export default function KaryawanBaruPage() {
               </div>
             </div>
           </form>
-          </div>
-        </main>
+        </div>
       </div>
       <Footer />
-    </div>
-  );
+    </main>
+  </div>
+</div>
+);
 }
