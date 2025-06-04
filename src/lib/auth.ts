@@ -1,18 +1,13 @@
 import { supabase } from './supabase';
 
 export const getAuthRedirectUrl = () => {
-  // Gunakan URL dari environment variable jika tersedia
-  if (process.env.NEXT_PUBLIC_AUTH_REDIRECT_URL) {
-    return process.env.NEXT_PUBLIC_AUTH_REDIRECT_URL;
-  }
-  
-  // Gunakan window.location.origin di browser
+  // Selalu gunakan window.location.origin di browser
   if (typeof window !== 'undefined') {
     return `${window.location.origin}/auth/callback`;
   }
   
-  // Fallback ke localhost
-  return 'http://localhost:3000/auth/callback';
+  // Fallback untuk SSR (tidak akan pernah terjadi di browser)
+  return '/auth/callback';
 };
 
 export const signInWithGoogle = async () => {

@@ -48,18 +48,15 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     try {
       setLoading(true);
       
-      // Gunakan URL dari environment variable atau window.location.origin
-      const redirectUrl = process.env.NEXT_PUBLIC_AUTH_REDIRECT_URL || 
-                        (typeof window !== 'undefined' ? `${window.location.origin}/auth/callback` : '');
-      
-      if (!redirectUrl) {
-        throw new Error('Redirect URL is not defined');
+      // Pastikan kita berada di browser
+      if (typeof window === 'undefined') {
+        throw new Error('This function must be called on the client side');
       }
 
       const { error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
-          redirectTo: redirectUrl,
+          redirectTo: `${window.location.origin}/auth/callback`,
           queryParams: {
             access_type: 'offline',
             prompt: 'consent',
