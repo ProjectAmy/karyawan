@@ -90,8 +90,12 @@ export default function Home() {
                 }
               });
               if (error) throw error;
-            } catch (err: any) {
-              setError(err.message || 'Gagal login dengan Google');
+            } catch (err: unknown) {
+              if (err instanceof Error) {
+                setError(err.message || 'Gagal login dengan Google');
+              } else {
+                setError('Gagal login dengan Google');
+              }
             }
           }}
           className="bg-white border border-gray-400 text-gray-800 rounded-md px-4 py-2 font-bold hover:bg-gray-100 transition text-base shadow-md flex items-center justify-center gap-2"
