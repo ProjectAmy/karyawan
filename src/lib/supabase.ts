@@ -36,7 +36,15 @@ const supabase = isBrowser && supabaseUrl && supabaseAnonKey
       auth: {
         autoRefreshToken: true,
         persistSession: true,
-        detectSessionInUrl: true
+        detectSessionInUrl: true,
+        flowType: 'pkce',
+        debug: process.env.NODE_ENV === 'development',
+        storageKey: 'sb-auth-token',
+        storage: {
+          getItem: (key: string) => window.localStorage.getItem(key),
+          setItem: (key: string, value: string) => window.localStorage.setItem(key, value),
+          removeItem: (key: string) => window.localStorage.removeItem(key)
+        }
       }
     })
   : {
