@@ -53,10 +53,13 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         throw new Error('This function must be called on the client side');
       }
 
+      const redirectUrl = `${window.location.origin}/auth/callback`;
+      console.log('Initiating Google sign in with redirect URL:', redirectUrl);
+
       const { error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
-          redirectTo: `${window.location.origin}/auth/callback`,
+          redirectTo: redirectUrl,
           queryParams: {
             access_type: 'offline',
             prompt: 'consent',
@@ -64,7 +67,10 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         },
       });
       
-      if (error) throw error;
+      if (error) {
+        console.error('Supabase auth error:', error);
+        throw error;
+      }
     } catch (error) {
       console.error('Error signing in with Google:', error);
       throw error;

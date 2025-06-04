@@ -1,13 +1,17 @@
 import { supabase } from './supabase';
 
 export const getAuthRedirectUrl = () => {
-  // Selalu gunakan window.location.origin di browser
-  if (typeof window !== 'undefined') {
-    return `${window.location.origin}/auth/callback`;
+  // Pastikan kita di browser
+  if (typeof window === 'undefined') {
+    return '/auth/callback';
   }
   
-  // Fallback untuk SSR (tidak akan pernah terjadi di browser)
-  return '/auth/callback';
+  // Gunakan URL lengkap dengan protokol, domain, dan path
+  const currentUrl = new URL(window.location.href);
+  const redirectUrl = `${currentUrl.protocol}//${currentUrl.host}/auth/callback`;
+  
+  console.log('Redirect URL set to:', redirectUrl);
+  return redirectUrl;
 };
 
 export const signInWithGoogle = async () => {
