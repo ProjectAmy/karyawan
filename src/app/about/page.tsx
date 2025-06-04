@@ -24,7 +24,7 @@ export default function AboutPage() {
               <h1 className="text-3xl md:text-4xl font-bold tracking-wide">Tentang Kami</h1>
             </div>
             <div className="bg-white rounded-b-lg shadow p-6 text-gray-800 space-y-4">
-              <p className="text-lg font-semibold text-green-700">Aplikasi Dashboard HRD - Project Amy</p>
+              <p className="text-lg font-semibold text-green-700">Aplikasi Dashboard HRD</p>
               <p>
                 <strong>Versi:</strong> 1.0.0
               </p>
