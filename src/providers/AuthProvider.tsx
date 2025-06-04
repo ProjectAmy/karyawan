@@ -3,6 +3,7 @@
 import { Session, User } from '@supabase/supabase-js';
 import { createContext, useContext, useEffect, useState } from 'react';
 import { supabase } from '@/lib/supabase';
+import { signInWithGoogle as signInWithGoogleAuth } from '@/lib/auth';
 
 type AuthContextType = {
   user: User | null;
@@ -47,30 +48,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const signInWithGoogle = async () => {
     try {
       setLoading(true);
-      
-      // Pastikan kita berada di browser
-      if (typeof window === 'undefined') {
-        throw new Error('This function must be called on the client side');
-      }
-
-      const redirectUrl = `${window.location.origin}/auth/callback`;
-      console.log('Initiating Google sign in with redirect URL:', redirectUrl);
-
-      const { error } = await supabase.auth.signInWithOAuth({
-        provider: 'google',
-        options: {
-          redirectTo: redirectUrl,
-          queryParams: {
-            access_type: 'offline',
-            prompt: 'consent',
-          },
-        },
-      });
-      
-      if (error) {
-        console.error('Supabase auth error:', error);
-        throw error;
-      }
+      const { error } = await signInWithGoogleAuth();
+      if (error) throw error;
     } catch (error) {
       console.error('Error signing in with Google:', error);
       throw error;

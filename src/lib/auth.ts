@@ -1,25 +1,19 @@
 import { supabase } from './supabase';
 
-export const getAuthRedirectUrl = () => {
-  // Pastikan kita di browser
-  if (typeof window === 'undefined') {
-    return '/auth/callback';
-  }
-  
-  // Gunakan URL lengkap dengan protokol, domain, dan path
-  const currentUrl = new URL(window.location.href);
-  const redirectUrl = `${currentUrl.protocol}//${currentUrl.host}/auth/callback`;
-  
-  console.log('Redirect URL set to:', redirectUrl);
-  return redirectUrl;
-};
-
 export const signInWithGoogle = async () => {
   try {
+    // Pastikan kita di browser
+    if (typeof window === 'undefined') {
+      throw new Error('This function must be called on the client side');
+    }
+
+    const redirectUrl = `${window.location.origin}/auth/callback`;
+    console.log('Signing in with Google, redirect URL:', redirectUrl);
+
     const { error } = await supabase.auth.signInWithOAuth({
       provider: 'google',
       options: {
-        redirectTo: getAuthRedirectUrl(),
+        redirectTo: redirectUrl,
         queryParams: {
           access_type: 'offline',
           prompt: 'consent',
