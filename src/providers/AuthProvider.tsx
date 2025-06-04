@@ -47,12 +47,26 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const signInWithGoogle = async () => {
     try {
       setLoading(true);
+      
+      // Gunakan URL dari environment variable atau window.location.origin
+      const redirectUrl = process.env.NEXT_PUBLIC_AUTH_REDIRECT_URL || 
+                        (typeof window !== 'undefined' ? `${window.location.origin}/auth/callback` : '');
+      
+      if (!redirectUrl) {
+        throw new Error('Redirect URL is not defined');
+      }
+
       const { error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
-          redirectTo: `${window.location.origin}/auth/callback`,
+          redirectTo: redirectUrl,
+          queryParams: {
+            access_type: 'offline',
+            prompt: 'consent',
+          },
         },
       });
+      
       if (error) throw error;
     } catch (error) {
       console.error('Error signing in with Google:', error);
