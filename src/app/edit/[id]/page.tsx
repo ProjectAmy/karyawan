@@ -153,7 +153,7 @@ export default function EditEmployee() {
 
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const handleLogout = () => {
-    router.push('/login');
+    router.push('/');
   };
 
   if (isLoading) {

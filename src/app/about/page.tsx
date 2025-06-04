@@ -10,7 +10,7 @@ export default function AboutPage() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const router = useRouter();
   const handleLogout = () => {
-    router.push("/login");
+    router.push("/");
   };
 
   return (
