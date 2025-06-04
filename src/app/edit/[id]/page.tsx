@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
 import Header from '@/app/components/Header';
-
+import Sidebar from '@/app/components/Sidebar';
 import Footer from '@/app/components/Footer';
 
 interface Karyawan {
@@ -151,12 +151,23 @@ export default function EditEmployee() {
     fetchEmployee();
   }, [fetchEmployee]);
 
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const handleLogout = () => {
+    router.push('/login');
+  };
+
   if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <div className="w-16 h-16 border-4 border-blue-500 border-t-transparent rounded-full animate-spin mx-auto"></div>
-          <p className="mt-4 text-lg">Loading employee data...</p>
+      <div className="flex h-screen overflow-hidden">
+        <Sidebar onLogout={handleLogout} open={sidebarOpen} onClose={() => setSidebarOpen(false)} />
+        <div className="relative flex flex-col flex-1 overflow-y-auto overflow-x-hidden">
+          <Header onMenuClick={() => setSidebarOpen(true)} />
+          <main className="grow bg-white flex items-center justify-center">
+            <div className="text-center">
+              <div className="w-16 h-16 border-4 border-blue-500 border-t-transparent rounded-full animate-spin mx-auto"></div>
+              <p className="mt-4 text-lg">Loading employee data...</p>
+            </div>
+          </main>
         </div>
       </div>
     );
@@ -164,24 +175,30 @@ export default function EditEmployee() {
   
   if (errorMessage) {
     return (
-      <div className="min-h-screen flex items-center justify-center p-4">
-        <div className="bg-red-50 p-6 rounded-lg max-w-2xl w-full">
-          <h2 className="text-xl font-bold text-red-700 mb-2">Error</h2>
-          <p className="text-red-600">{errorMessage}</p>
-          <div className="mt-4 space-x-2">
-            <button
-              onClick={() => window.location.reload()}
-              className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
-            >
-              Try Again
-            </button>
-            <button
-              onClick={() => router.push('/login')}
-              className="px-4 py-2 bg-gray-200 text-gray-700 rounded hover:bg-gray-300"
-            >
-              Go to Login
-            </button>
-          </div>
+      <div className="flex h-screen overflow-hidden">
+        <Sidebar onLogout={handleLogout} open={sidebarOpen} onClose={() => setSidebarOpen(false)} />
+        <div className="relative flex flex-col flex-1 overflow-y-auto overflow-x-hidden">
+          <Header onMenuClick={() => setSidebarOpen(true)} />
+          <main className="grow bg-white flex items-center justify-center p-4">
+            <div className="bg-red-50 p-6 rounded-lg max-w-2xl w-full">
+              <h2 className="text-xl font-bold text-red-700 mb-2">Error</h2>
+              <p className="text-red-600">{errorMessage}</p>
+              <div className="mt-4 space-x-2">
+                <button
+                  onClick={() => window.location.reload()}
+                  className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+                >
+                  Try Again
+                </button>
+                <button
+                  onClick={() => router.push('/login')}
+                  className="px-4 py-2 bg-gray-200 text-gray-700 rounded hover:bg-gray-300"
+                >
+                  Go to Login
+                </button>
+              </div>
+            </div>
+          </main>
         </div>
       </div>
     );
@@ -189,9 +206,9 @@ export default function EditEmployee() {
 
   return (
     <div className="flex h-screen overflow-hidden">
+      <Sidebar onLogout={handleLogout} open={sidebarOpen} onClose={() => setSidebarOpen(false)} />
       <div className="relative flex flex-col flex-1 overflow-y-auto overflow-x-hidden">
-        {/* Header - Sidebar is handled in the layout component */}
-        <Header onMenuClick={() => {}} />
+        <Header onMenuClick={() => setSidebarOpen(true)} />
         
         {/* Main Content */}
         <main className="grow bg-white">
